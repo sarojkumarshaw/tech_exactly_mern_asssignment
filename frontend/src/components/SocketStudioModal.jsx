@@ -288,3 +288,4 @@ export const SocketStudioModal = ({ isOpen, onClose }) => {
     </div>
   );
 };
+

@@ -207,15 +207,14 @@ export const NotificationProvider = ({ children }) => {
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`pointer-events-auto flex items-center justify-between p-4 rounded-xl shadow-xl text-sm font-medium transition-all transform animate-in slide-in-from-bottom-5 duration-300 ${
-              toast.type === 'success'
+            className={`pointer-events-auto flex items-center justify-between p-4 rounded-xl shadow-xl text-sm font-medium transition-all transform animate-in slide-in-from-bottom-5 duration-300 ${toast.type === 'success'
                 ? 'bg-emerald-600 text-white shadow-emerald-600/20'
                 : toast.type === 'error'
-                ? 'bg-rose-600 text-white shadow-rose-600/20'
-                : toast.type === 'warning'
-                ? 'bg-amber-500 text-white shadow-amber-500/20'
-                : 'bg-slate-900 text-white shadow-slate-900/20'
-            }`}
+                  ? 'bg-rose-600 text-white shadow-rose-600/20'
+                  : toast.type === 'warning'
+                    ? 'bg-amber-500 text-white shadow-amber-500/20'
+                    : 'bg-slate-900 text-white shadow-slate-900/20'
+              }`}
           >
             <div className="flex items-center gap-2">
               <span>{toast.message}</span>
