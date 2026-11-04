@@ -25,3 +25,4 @@ router.put('/:id', authenticate, checkCommentOwnershipOrAdmin, validate(updateCo
 router.delete('/:id', authenticate, checkCommentOwnershipOrAdmin, validate(commentIdParamSchema), deleteComment);
 
 export default router;
+

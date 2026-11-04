@@ -69,3 +69,4 @@ activityLogSchema.index({ createdAt: -1 });
 activityLogSchema.index({ entityType: 1, action: 1 });
 
 export const ActivityLog = mongoose.model('ActivityLog', activityLogSchema);
+

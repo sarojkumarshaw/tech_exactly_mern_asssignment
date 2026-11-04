@@ -66,3 +66,4 @@ const errorLogSchema = new mongoose.Schema(
 errorLogSchema.index({ createdAt: -1 });
 
 export const ErrorLog = mongoose.model('ErrorLog', errorLogSchema);
+

@@ -33,3 +33,4 @@ export const socialLoginSchema = z.object({
     avatar: z.string().optional()
   })
 });
+

@@ -22,3 +22,4 @@ export const getMyPosts = asyncHandler(async (req, res) => {
 
   return ApiResponse.paginated(res, 'User posts retrieved successfully', result.docs, result.pagination);
 });
+

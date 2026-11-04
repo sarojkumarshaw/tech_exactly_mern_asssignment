@@ -27,3 +27,4 @@ export const generateUniqueSlug = async (title, currentPostId = null) => {
     counter += 1;
   }
 };
+

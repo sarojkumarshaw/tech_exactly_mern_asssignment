@@ -7,7 +7,8 @@ import {
   deleteUser,
   getAdminPosts,
   getActivityLogs,
-  getErrorLogs
+  getErrorLogs,
+  broadcastAnnouncement
 } from '../controllers/admin.controller.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 import { authorizeRoles } from '../middleware/rbac.middleware.js';
@@ -31,5 +32,7 @@ router.delete('/users/:id', validate(userIdParamSchema), deleteUser);
 router.get('/posts', getAdminPosts);
 router.get('/logs/activity', getActivityLogs);
 router.get('/logs/error', getErrorLogs);
+router.post('/broadcast', broadcastAnnouncement);
 
 export default router;
+

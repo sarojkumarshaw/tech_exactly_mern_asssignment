@@ -35,3 +35,4 @@ export const deleteComment = asyncHandler(async (req, res) => {
   const result = await CommentService.deleteComment(id, req.user, req);
   return ApiResponse.success(res, 200, result.message);
 });
+

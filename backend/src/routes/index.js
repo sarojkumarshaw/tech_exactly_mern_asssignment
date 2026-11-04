@@ -22,3 +22,4 @@ router.use('/admin', adminRoutes);
 router.use('/users', userRoutes);
 
 export default router;
+

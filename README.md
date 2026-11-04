@@ -267,3 +267,4 @@ All endpoints are versioned under `/api/v1`.
 | **Clean Architecture & Modularity**| Strict layer decoupling: `Controllers -> Services -> Models`. Independent reusable middlewares for auth, RBAC, logging, rate limiting. |
 | **Security & Optimization** | Bcrypt hashing (12 rounds), dual JWT token rotation, Helmet security headers, rate limiting, XSS sanitization, compound indexes, lean queries. |
 | **Documentation & Reusability** | Detailed `COMMANDS.md` for replication, thorough `README.md`, pre-configured seeder script, and 15 Jest tests. |
+

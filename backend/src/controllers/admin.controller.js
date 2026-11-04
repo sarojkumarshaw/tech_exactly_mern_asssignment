@@ -1,6 +1,22 @@
 import { AdminService } from '../services/admin.service.js';
 import { ApiResponse } from '../utils/apiResponse.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
+import { getSocketIO } from '../sockets/socket.js';
+
+export const broadcastAnnouncement = asyncHandler(async (req, res) => {
+  const { title, message } = req.body;
+  const io = getSocketIO();
+  if (io) {
+    io.emit('broadcast_announcement', {
+      id: Date.now(),
+      title: title || 'System Announcement',
+      message: message || 'Live real-time announcement from the Administrator',
+      sender: req.user?.name || 'Administrator',
+      createdAt: new Date().toISOString()
+    });
+  }
+  return ApiResponse.success(res, 200, 'Announcement broadcasted in real-time');
+});
 
 export const getDashboardStats = asyncHandler(async (req, res) => {
   const data = await AdminService.getDashboardStats();
@@ -55,3 +71,4 @@ export const getErrorLogs = asyncHandler(async (req, res) => {
   const result = await AdminService.getErrorLogs({ page, limit });
   return ApiResponse.paginated(res, 'Error logs fetched successfully', result.docs, result.pagination);
 });
+

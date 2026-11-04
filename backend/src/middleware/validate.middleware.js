@@ -22,3 +22,4 @@ export const validate = (schema) => (req, res, next) => {
     next(new ApiError(422, 'Request validation failed', details, 'VALIDATION_ERROR'));
   }
 };
+

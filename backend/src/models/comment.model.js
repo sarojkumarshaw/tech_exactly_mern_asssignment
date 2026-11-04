@@ -35,3 +35,4 @@ commentSchema.index({ post: 1, createdAt: -1 });
 commentSchema.index({ author: 1, createdAt: -1 });
 
 export const Comment = mongoose.model('Comment', commentSchema);
+

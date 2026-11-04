@@ -49,3 +49,4 @@ export class ApiError extends Error {
     return new ApiError(500, message, details, 'INTERNAL_SERVER_ERROR');
   }
 }
+

@@ -71,3 +71,4 @@ export const getMe = asyncHandler(async (req, res) => {
     user: req.user
   });
 });
+

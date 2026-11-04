@@ -35,3 +35,4 @@ router.patch('/:id/restore', authenticate, checkPostOwnershipOrAdmin, validate(p
 router.delete('/:id/permanent', authenticate, authorizeRoles('admin'), validate(postIdParamSchema), hardDeletePost);
 
 export default router;
+

@@ -226,3 +226,4 @@ export const CreatePost = () => {
     </div>
   );
 };
+
