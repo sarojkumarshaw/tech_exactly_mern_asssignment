@@ -1,0 +1,19 @@
+{
+  "name": "mern-stack-assignment",
+  "version": "1.0.0",
+  "description": "Production-Grade Full-Stack MERN Blog System with RBAC, JWT Auth, Soft Deletes, Winston Logging, Admin Panel, and Socket.io Real-time Notifications",
+  "scripts": {
+    "install:backend": "cd backend && npm install",
+    "install:frontend": "cd frontend && npm install",
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "seed": "cd backend && npm run seed",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"blue,magenta\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "test": "cd backend && npm test",
+    "build": "cd frontend && npm run build"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
