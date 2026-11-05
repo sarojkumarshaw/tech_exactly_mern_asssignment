@@ -3,6 +3,7 @@ import { Post } from '../models/post.model.js';
 import { ApiError } from '../utils/apiError.js';
 import { logActivity } from '../middleware/activityLogger.middleware.js';
 import { getSocketIO } from '../sockets/socket.js';
+import { NotificationService } from './notification.service.js';
 
 export class CommentService {
   /**
@@ -33,23 +34,24 @@ export class CommentService {
       details: { postId, postTitle: post.title }
     });
 
-    // Real-time notification to post author and commenter
+    // Real-time notification to post author and commenter (Persisted to MongoDB)
     try {
+      // 1. Persist notification to MongoDB & emit to post author
+      await NotificationService.createNotification({
+        recipient: post.author,
+        sender: authorUser._id,
+        type: 'COMMENT_ON_POST',
+        title: 'New Comment on Your Article',
+        message: `${authorUser.name} commented on your post "${post.title}"`,
+        postId: post._id,
+        slug: post.slug,
+        link: `/posts/${post.slug}`
+      });
+
       const io = getSocketIO();
       if (io) {
         // Broadcast new comment to anyone viewing this post room
         io.to(`post_${postId}`).emit('new_comment', populatedComment);
-
-        // Targeted notification to post author
-        io.to(`user_${post.author.toString()}`).emit('notification', {
-          type: 'COMMENT_ON_POST',
-          title: 'New Comment',
-          message: `${authorUser.name} commented on your post "${post.title}"`,
-          postId: post._id,
-          slug: post.slug,
-          commentId: comment._id,
-          createdAt: comment.createdAt
-        });
 
         // Also emit notification to commenter if different, so both users experience real-time push feedback
         if (authorUser._id.toString() !== post.author.toString()) {
@@ -65,7 +67,7 @@ export class CommentService {
         }
       }
     } catch {
-      // Socket optional
+      // Socket / Notification optional
     }
 
     return populatedComment;

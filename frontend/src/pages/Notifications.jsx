@@ -126,8 +126,8 @@ export const Notifications = () => {
               <button
                 onClick={requestNotificationPermission}
                 className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all flex items-center gap-1 ${desktopPermission === 'granted'
-                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                    : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80'
+                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                  : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80'
                   }`}
                 title="Enable OS Desktop Push Notifications"
               >
@@ -148,8 +148,8 @@ export const Notifications = () => {
               <button
                 onClick={() => setActiveFilter('all')}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${activeFilter === 'all'
-                    ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20'
-                    : 'text-slate-600 hover:bg-slate-100'
+                  ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20'
+                  : 'text-slate-600 hover:bg-slate-100'
                   }`}
               >
                 All ({notifications.length})
@@ -157,8 +157,8 @@ export const Notifications = () => {
               <button
                 onClick={() => setActiveFilter('unread')}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${activeFilter === 'unread'
-                    ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20'
-                    : 'text-slate-600 hover:bg-slate-100'
+                  ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20'
+                  : 'text-slate-600 hover:bg-slate-100'
                   }`}
               >
                 Unread ({unreadCount})
@@ -166,8 +166,8 @@ export const Notifications = () => {
               <button
                 onClick={() => setActiveFilter('announcements')}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${activeFilter === 'announcements'
-                    ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20'
-                    : 'text-slate-600 hover:bg-slate-100'
+                  ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20'
+                  : 'text-slate-600 hover:bg-slate-100'
                   }`}
               >
                 Broadcasts
@@ -219,8 +219,8 @@ export const Notifications = () => {
                 <div
                   key={item.id}
                   className={`bg-white rounded-2xl border p-4 transition-all shadow-sm flex items-start gap-4 ${!item.read
-                      ? 'border-blue-300 bg-blue-50/20'
-                      : 'border-slate-200/80 hover:border-slate-300'
+                    ? 'border-blue-300 bg-blue-50/20'
+                    : 'border-slate-200/80 hover:border-slate-300'
                     }`}
                 >
                   <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex-shrink-0">

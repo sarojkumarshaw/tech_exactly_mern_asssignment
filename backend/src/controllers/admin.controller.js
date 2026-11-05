@@ -1,21 +1,20 @@
 import { AdminService } from '../services/admin.service.js';
 import { ApiResponse } from '../utils/apiResponse.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
-import { getSocketIO } from '../sockets/socket.js';
+import { NotificationService } from '../services/notification.service.js';
 
 export const broadcastAnnouncement = asyncHandler(async (req, res) => {
   const { title, message } = req.body;
-  const io = getSocketIO();
-  if (io) {
-    io.emit('broadcast_announcement', {
-      id: Date.now(),
-      title: title || 'System Announcement',
-      message: message || 'Live real-time announcement from the Administrator',
-      sender: req.user?.name || 'Administrator',
-      createdAt: new Date().toISOString()
-    });
-  }
-  return ApiResponse.success(res, 200, 'Announcement broadcasted in real-time');
+  const announcement = await NotificationService.createNotification({
+    recipient: null, // Global announcement for all users
+    sender: req.user?._id,
+    type: 'ANNOUNCEMENT',
+    title: title || 'System Announcement',
+    message: message || 'Live real-time announcement from the Administrator',
+    link: '/notifications'
+  });
+
+  return ApiResponse.success(res, 200, 'Announcement broadcasted in real-time and stored to DB', announcement);
 });
 
 export const getDashboardStats = asyncHandler(async (req, res) => {

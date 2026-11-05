@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import { useAuth } from './AuthContext';
+import api from '../services/api';
 
 const NotificationContext = createContext(null);
 
@@ -129,14 +130,46 @@ export const NotificationProvider = ({ children }) => {
     ]);
   }, []);
 
-  const markAllAsRead = () => {
+  // Sync with MongoDB backend for authenticated users
+  useEffect(() => {
+    if (!user?._id) return;
+
+    let isMounted = true;
+    const fetchNotifications = async () => {
+      try {
+        const res = await api.get('/notifications?limit=30');
+        if (isMounted && res.data?.data) {
+          setNotifications(res.data.data);
+        }
+      } catch {
+        // Fallback to local state if offline or during setup
+      }
+    };
+
+    fetchNotifications();
+    return () => {
+      isMounted = false;
+    };
+  }, [user?._id]);
+
+  const markAllAsRead = async () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    try {
+      if (user?._id) {
+        await api.patch('/notifications/read-all');
+      }
+    } catch {
+      // ignore
+    }
   };
 
-  const clearNotifications = () => {
+  const clearNotifications = async () => {
     setNotifications([]);
     try {
       localStorage.removeItem('app_notifications');
+      if (user?._id) {
+        await api.delete('/notifications');
+      }
     } catch {
       // ignore
     }
