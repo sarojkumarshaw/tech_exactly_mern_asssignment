@@ -36,3 +36,4 @@ export const clearNotifications = asyncHandler(async (req, res) => {
   const result = await NotificationService.clearUserNotifications(req.user._id);
   return ApiResponse.success(res, 200, result.message);
 });
+

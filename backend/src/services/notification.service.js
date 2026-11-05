@@ -136,3 +136,4 @@ export class NotificationService {
     return { message: 'Notifications cleared successfully' };
   }
 }
+

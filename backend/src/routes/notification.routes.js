@@ -18,3 +18,4 @@ router.patch('/:id/read', markAsRead);
 router.delete('/', clearNotifications);
 
 export default router;
+
