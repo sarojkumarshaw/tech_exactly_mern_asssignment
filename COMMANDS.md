@@ -1,6 +1,6 @@
-# DevSphere MERN Blog Project - Setup & Command Guide
+# Tech Exactly MERN Stack Assignment - Setup & Command Guide
 
-This document contains all shell commands and step-by-step procedures required to scaffold, configure, install, seed, test, and run the DevSphere MERN stack project from scratch.
+This document contains all shell commands and step-by-step procedures required to scaffold, configure, install, seed, test, and run the Tech Exactly MERN stack assignment project from scratch.
 
 ---
 
@@ -231,4 +231,22 @@ This automated suite tests:
 4. Clean user logout.
 5. Facebook OAuth 2.0 initiation via `/api/v1/auth/facebook`.
 6. Profile verification and session termination.
+
+---
+
+## 10. Verifying Real-Time Notifications & Admin Broadcasts
+
+To test the Tech Exactly branding, Notification Center (`/notifications`), and Admin WebSocket broadcasting:
+
+```powershell
+# In project root:
+node scripts/test_techexactly_features.js
+```
+
+This automated suite tests:
+1. Tech Exactly branding, title ("Tech Exactly - MERN Stack Assignment"), and custom SVG logo.
+2. Direct navigation to the Notification Center (`/notifications`).
+3. Real-time Socket.io latency verification and event subscription.
+4. Admin authentication and navigation to the **"Send Notifications & Broadcast"** tab.
+5. Emitting global announcements via WebSockets and logging to the dispatch history.
 

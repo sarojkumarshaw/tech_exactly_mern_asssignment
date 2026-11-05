@@ -1,17 +1,17 @@
-# DevSphere - Production-Grade MERN Blog Platform
+# Tech Exactly - MERN Stack Assignment Platform
 
 [![Build Status](https://img.shields.io/badge/Build-Passing-emerald)](https://github.com)
 [![Tests Coverage](https://img.shields.io/badge/Jest%20Tests-15%20Passed-blue)](https://jestjs.io)
 [![Stack](https://img.shields.io/badge/MERN-MongoDB%20%7C%20Express%20%7C%20React%20%7C%20Node-indigo)](https://react.dev)
 [![Architecture](https://img.shields.io/badge/Architecture-Clean%20%26%20Modular-violet)](https://expressjs.com)
 
-**DevSphere** is a high-performance, modular full-stack blog platform built with MongoDB, Express.js, React.js, and Node.js. It features **Role-Based Access Control (RBAC)**, **dual JWT access and refresh token authentication**, **soft deletion with admin recovery**, **database-backed activity logging & Winston error logging**, **centralized error handling**, **Zod request validation**, **MongoDB query indexing and pagination**, and **real-time Socket.io notifications**.
+**Tech Exactly Assignment Platform** is a high-performance, modular full-stack blog platform built with MongoDB, Express.js, React.js, and Node.js. It features **Role-Based Access Control (RBAC)**, **dual JWT access and refresh token authentication**, **soft deletion with admin recovery**, **database-backed activity logging & Winston error logging**, **centralized error handling**, **Zod request validation**, **MongoDB query indexing and pagination**, and **real-time Socket.io notifications & admin broadcast controls**.
 
 ---
 
 ## Architecture Overview
 
-DevSphere follows Clean Architecture principles with strict separation of concerns:
+The system follows Clean Architecture principles with strict separation of concerns:
 
 ```
 [ React 18 Frontend + Vite + Tailwind CSS ]

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import { User, Mail, Lock, Eye, EyeOff, UserPlus, ArrowRight } from 'lucide-react';
+import { TechExactlyLogo } from '../components/TechExactlyLogo';
 
 export const Register = () => {
   const navigate = useNavigate();
@@ -43,14 +44,14 @@ export const Register = () => {
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
       <div className="max-w-md w-full space-y-8 bg-white p-8 sm:p-10 rounded-3xl border border-slate-200/80 shadow-xl">
         <div className="text-center">
-          <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-600/30">
-            <UserPlus className="w-6 h-6" />
+          <div className="flex justify-center mb-5">
+            <TechExactlyLogo size="lg" showTag={true} />
           </div>
           <h2 className="text-2xl font-black text-slate-900 tracking-tight">
-            Create your account
+            Create an Account
           </h2>
           <p className="text-xs text-slate-500 mt-1.5">
-            Join thousands of software engineers sharing modern tech insights.
+            Register to create articles, leave comments, and explore RBAC features.
           </p>
         </div>
 

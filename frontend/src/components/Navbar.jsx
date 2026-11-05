@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import {
-  BookOpen,
   PlusCircle,
   Shield,
   FileText,
@@ -12,8 +11,12 @@ import {
   Menu,
   X,
   User as UserIcon,
-  Radio
+  Radio,
+  Zap,
+  ExternalLink,
+  CheckCircle2
 } from 'lucide-react';
+import { TechExactlyLogo } from './TechExactlyLogo';
 import { SocketStudioModal } from './SocketStudioModal';
 
 export const Navbar = () => {
@@ -34,43 +37,46 @@ export const Navbar = () => {
     <nav className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Brand Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
-              <BookOpen className="w-5 h-5" />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-                DevSphere
-              </span>
-              <span className="text-[10px] uppercase font-bold tracking-widest text-indigo-600 -mt-1">
-                Engineering Blog
-              </span>
-            </div>
+          {/* Brand Logo - Tech Exactly */}
+          <Link to="/" className="flex items-center group">
+            <TechExactlyLogo size="md" showTag={true} />
           </Link>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-5">
             <Link
               to="/"
-              className="text-sm font-semibold text-slate-600 hover:text-indigo-600 transition-colors"
+              className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors"
             >
               Explore Articles
+            </Link>
+
+            <Link
+              to="/notifications"
+              className="flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors relative"
+            >
+              <Bell className="w-4 h-4 text-slate-400" />
+              Notifications
+              {unreadCount > 0 && (
+                <span className="flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white">
+                  {unreadCount}
+                </span>
+              )}
             </Link>
 
             {isAuthenticated && (
               <>
                 <Link
                   to="/create-post"
-                  className="flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-indigo-600 transition-colors"
+                  className="flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors"
                 >
-                  <PlusCircle className="w-4 h-4 text-indigo-600" />
+                  <PlusCircle className="w-4 h-4 text-blue-600" />
                   Write Post
                 </Link>
 
                 <Link
                   to="/my-posts"
-                  className="flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-indigo-600 transition-colors"
+                  className="flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors"
                 >
                   <FileText className="w-4 h-4 text-slate-400" />
                   My Posts
@@ -81,9 +87,9 @@ export const Navbar = () => {
             {isAdmin && (
               <Link
                 to="/admin"
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors shadow-sm"
               >
-                <Shield className="w-3.5 h-3.5" />
+                <Shield className="w-3.5 h-3.5 text-amber-600" />
                 Admin Panel
               </Link>
             )}
@@ -92,14 +98,14 @@ export const Navbar = () => {
           {/* Right Action Icons / Auth Controls */}
           <div className="hidden md:flex items-center gap-3">
             {/* Live Socket.io Testing Studio Trigger Button */}
-            <button
+            {/* <button
               onClick={() => setIsStudioOpen(true)}
               className="flex items-center gap-1.5 px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/80 rounded-xl text-xs font-bold transition-all shadow-sm group"
               title="Open Live Socket.io Testing Studio"
             >
               <Radio className="w-3.5 h-3.5 text-emerald-600 animate-pulse group-hover:scale-110" />
               <span>Socket.io Live</span>
-            </button>
+            </button> */}
 
             {isAuthenticated ? (
               <>
@@ -123,45 +129,82 @@ export const Navbar = () => {
 
                   {/* Notification Dropdown */}
                   {showNotifications && (
-                    <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 py-3 z-50 animate-in fade-in zoom-in-95 duration-150">
+                    <div className="absolute right-0 mt-2 w-84 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-100 py-3 z-50 animate-in fade-in zoom-in-95 duration-150">
                       <div className="flex items-center justify-between px-4 pb-2 border-b border-slate-100">
-                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                          Live Notifications
-                        </span>
-                        {notifications.length > 0 && (
-                          <button
-                            onClick={clearNotifications}
-                            className="text-[11px] text-slate-400 hover:text-rose-500"
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                            Notifications
+                          </span>
+                          <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[9px] font-bold">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            Live
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Link
+                            to="/notifications"
+                            onClick={() => setShowNotifications(false)}
+                            className="text-[11px] font-bold text-blue-600 hover:text-blue-700"
                           >
-                            Clear
-                          </button>
-                        )}
+                            Full View →
+                          </Link>
+                          {notifications.length > 0 && (
+                            <button
+                              onClick={clearNotifications}
+                              className="text-[11px] text-slate-400 hover:text-rose-500"
+                            >
+                              Clear
+                            </button>
+                          )}
+                        </div>
                       </div>
 
-                      <div className="max-h-72 overflow-y-auto divide-y divide-slate-50">
+                      <div className="max-h-80 overflow-y-auto divide-y divide-slate-50">
                         {notifications.length === 0 ? (
-                          <div className="py-6 text-center text-xs text-slate-400">
-                            No notifications yet
+                          <div className="py-8 text-center px-4">
+                            <Bell className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                            <div className="text-xs font-semibold text-slate-500">No new notifications</div>
+                            <p className="text-[10px] text-slate-400 mt-0.5">
+                              Real-time post updates and admin broadcasts will appear here.
+                            </p>
                           </div>
                         ) : (
-                          notifications.map((item, index) => (
+                          notifications.slice(0, 6).map((item, index) => (
                             <div
                               key={index}
                               onClick={() => {
                                 setShowNotifications(false);
-                                if (item.slug) navigate(`/posts/${item.slug}`);
+                                if (item.link) navigate(item.link);
+                                else if (item.slug) navigate(`/posts/${item.slug}`);
+                                else navigate('/notifications');
                               }}
                               className="px-4 py-3 hover:bg-slate-50 cursor-pointer text-xs text-slate-700 transition-colors"
                             >
-                              <div className="font-semibold text-slate-900 mb-0.5">
-                                {item.message}
+                              <div className="flex items-center justify-between gap-2 mb-0.5">
+                                <span className="font-bold text-slate-900 truncate">
+                                  {item.title || 'Live Notification'}
+                                </span>
+                                <span className="text-[10px] text-slate-400 whitespace-nowrap">
+                                  {item.createdAt ? new Date(item.createdAt).toLocaleTimeString() : 'Just now'}
+                                </span>
                               </div>
-                              <span className="text-[10px] text-slate-400">
-                                {item.createdAt ? new Date(item.createdAt).toLocaleTimeString() : 'Just now'}
-                              </span>
+                              <p className="text-xs text-slate-600 line-clamp-2">
+                                {item.message}
+                              </p>
                             </div>
                           ))
                         )}
+                      </div>
+
+                      <div className="px-4 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                        <span className="text-slate-400">Powered by Socket.io</span>
+                        <Link
+                          to="/notifications"
+                          onClick={() => setShowNotifications(false)}
+                          className="font-bold text-blue-600 hover:underline"
+                        >
+                          Open Notification Center
+                        </Link>
                       </div>
                     </div>
                   )}
@@ -239,6 +282,18 @@ export const Navbar = () => {
             className="block text-sm font-medium text-slate-700 py-2"
           >
             Explore Articles
+          </Link>
+          <Link
+            to="/notifications"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center justify-between text-sm font-medium text-slate-700 py-2"
+          >
+            <span>Notifications</span>
+            {unreadCount > 0 && (
+              <span className="px-2 py-0.5 rounded-full bg-blue-600 text-white text-[10px] font-bold">
+                {unreadCount} new
+              </span>
+            )}
           </Link>
           {isAuthenticated ? (
             <>

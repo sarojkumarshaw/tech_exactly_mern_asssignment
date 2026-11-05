@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import { Mail, Lock, Eye, EyeOff, LogIn, Shield, User, ArrowRight } from 'lucide-react';
+import { TechExactlyLogo } from '../components/TechExactlyLogo';
 
 export const Login = () => {
   const navigate = useNavigate();
@@ -78,14 +79,14 @@ export const Login = () => {
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
       <div className="max-w-md w-full space-y-8 bg-white p-8 sm:p-10 rounded-3xl border border-slate-200/80 shadow-xl">
         <div className="text-center">
-          <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-600/30">
-            <LogIn className="w-6 h-6" />
+          <div className="flex justify-center mb-5">
+            <TechExactlyLogo size="lg" showTag={true} />
           </div>
           <h2 className="text-2xl font-black text-slate-900 tracking-tight">
-            Welcome back to DevSphere
+            Sign In to Assignment Portal
           </h2>
           <p className="text-xs text-slate-500 mt-1.5">
-            Log in to manage your articles, comments, or access the admin panel.
+            Log in to evaluate MERN stack features, manage articles, or access the admin panel.
           </p>
         </div>
 
@@ -228,7 +229,7 @@ export const Login = () => {
           </div>
 
           {/* Sandbox Demo option for offline testing */}
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+          {/* <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
             <span className="text-slate-400 font-medium">Evaluation Demo Mode:</span>
             <div className="flex items-center gap-2">
               <button
@@ -249,10 +250,10 @@ export const Login = () => {
                 Facebook Demo
               </button>
             </div>
-          </div>
+          </div> */}
 
           {/* Explanatory Toggle */}
-          <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 text-[11px] text-slate-500">
+          {/* <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 text-[11px] text-slate-500">
             <button
               type="button"
               onClick={() => setShowOAuthInfo(!showOAuthInfo)}
@@ -266,14 +267,14 @@ export const Login = () => {
                 Clicking the main <strong>Facebook</strong> or <strong>Google</strong> button directly triggers the live OAuth 2.0 flow via Passport.js, redirecting to Facebook/Google. If you have not yet registered a free app on <strong>developers.facebook.com</strong>, Meta will show an "Invalid App ID" notice. Use <strong>Demo Mode</strong> to test the JWT token exchange locally without Meta developer credentials.
               </p>
             )}
-          </div>
+          </div> */}
 
-          <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-400">
+          {/* <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-400">
             <span>Powered by</span>
             <span className="font-semibold text-slate-600">Passport.js</span>
             <span>&amp;</span>
             <span className="font-semibold text-slate-600">Google Auth Library</span>
-          </div>
+          </div> */}
         </div>
 
         <p className="text-center text-xs text-slate-500">
