@@ -1,7 +1,7 @@
 # Tech Exactly MERN Stack Assignment - Video Demo Script & Walkthrough
 
 This document outlines the step-by-step presentation script corresponding to the automated video walkthrough recorded in:
-- `demo_video/tech_exactly_mern_assignment_walkthrough.webm` (also mirrored at `demo_video/devsphere_mern_demo_walkthrough.webm`)
+- `demo_video/tech_exactly_mern_assignment_walkthrough.webm`
 
 The video features on-screen step-by-step HUD badges guiding the evaluator through every single feature required by the **Tech Exactly MERN Stack Assignment specification (5–10 minute requirement)**.
 
@@ -153,10 +153,9 @@ The video features on-screen step-by-step HUD badges guiding the evaluator throu
 
 ---
 
-## Video File Locations
+## Video File Location
 
-- **Primary Walkthrough**: [`demo_video/tech_exactly_mern_assignment_walkthrough.webm`](file:///d:/nodereact/mern_assignment/demo_video/tech_exactly_mern_assignment_walkthrough.webm)
-- **Mirror Walkthrough**: [`demo_video/devsphere_mern_demo_walkthrough.webm`](file:///d:/nodereact/mern_assignment/demo_video/devsphere_mern_demo_walkthrough.webm)
+- **Walkthrough Video**: [`demo_video/tech_exactly_mern_assignment_walkthrough.webm`](file:///d:/nodereact/mern_assignment/demo_video/tech_exactly_mern_assignment_walkthrough.webm)
 - **Video Resolution**: 1280x720 (HD 720p, 60fps)
-- **Target Duration**: ~6.2 minutes (375+ seconds, fulfilling the 5–10 minute requirement)
+- **Target Duration**: **5.06 minutes (303.6 seconds)** — Fulfilling the strict 5–10 minute requirement
 - **Player Compatibility**: Plays natively in Google Chrome, Microsoft Edge, Firefox, or VLC Media Player.
