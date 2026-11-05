@@ -58,13 +58,20 @@ export const AdminDashboard = () => {
     }
   ]);
 
-  const handleSendBroadcast = (e) => {
+  const handleSendBroadcast = async (e) => {
     if (e) e.preventDefault();
     if (!broadcastTitle.trim() || !broadcastMessage.trim()) {
       showToast('Title and message are required', 'error');
       return;
     }
-    sendAdminBroadcast(broadcastTitle.trim(), broadcastMessage.trim());
+    try {
+      await api.post('/admin/broadcast', {
+        title: broadcastTitle.trim(),
+        message: broadcastMessage.trim()
+      });
+    } catch {
+      sendAdminBroadcast(broadcastTitle.trim(), broadcastMessage.trim());
+    }
     setBroadcastHistory((prev) => [
       {
         id: Date.now(),

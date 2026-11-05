@@ -3,10 +3,21 @@ import api from '../services/api';
 
 const AuthContext = createContext(null);
 
+const normalizeUser = (u) => {
+  if (!u) return null;
+  return { ...u, _id: u._id || u.id, id: u.id || u._id };
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem('user');
-    return saved ? JSON.parse(saved) : null;
+    if (!saved) return null;
+    try {
+      const parsed = JSON.parse(saved);
+      return normalizeUser(parsed);
+    } catch {
+      return null;
+    }
   });
   const [loading, setLoading] = useState(true);
 
@@ -16,7 +27,7 @@ export const AuthProvider = ({ children }) => {
       if (token) {
         try {
           const res = await api.get('/auth/me');
-          const userData = res.data.data.user;
+          const userData = normalizeUser(res.data.data.user);
           setUser(userData);
           localStorage.setItem('user', JSON.stringify(userData));
         } catch {
@@ -33,7 +44,8 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     const res = await api.post('/auth/login', { email, password });
-    const { user: userData, tokens } = res.data.data;
+    const { user: rawUser, tokens } = res.data.data;
+    const userData = normalizeUser(rawUser);
     localStorage.setItem('accessToken', tokens.accessToken);
     localStorage.setItem('refreshToken', tokens.refreshToken);
     localStorage.setItem('user', JSON.stringify(userData));
@@ -43,7 +55,8 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (name, email, password) => {
     const res = await api.post('/auth/register', { name, email, password });
-    const { user: userData, tokens } = res.data.data;
+    const { user: rawUser, tokens } = res.data.data;
+    const userData = normalizeUser(rawUser);
     localStorage.setItem('accessToken', tokens.accessToken);
     localStorage.setItem('refreshToken', tokens.refreshToken);
     localStorage.setItem('user', JSON.stringify(userData));
@@ -57,7 +70,8 @@ export const AuthProvider = ({ children }) => {
       token,
       ...details
     });
-    const { user: userData, tokens } = res.data.data;
+    const { user: rawUser, tokens } = res.data.data;
+    const userData = normalizeUser(rawUser);
     localStorage.setItem('accessToken', tokens.accessToken);
     localStorage.setItem('refreshToken', tokens.refreshToken);
     localStorage.setItem('user', JSON.stringify(userData));

@@ -1,6 +1,7 @@
 import { Server } from 'socket.io';
 import { logger } from '../config/logger.js';
 import { verifyAccessToken } from '../utils/tokens.js';
+import { NotificationService } from '../services/notification.service.js';
 
 let io = null;
 
@@ -30,12 +31,15 @@ export const initSocket = (server, clientOrigin) => {
     logger.info(`Socket connected: ${socket.id} (User: ${socket.user?.email || 'guest'})`);
 
     // If user is authenticated, join their personal room
-    if (socket.user?.sub) {
-      socket.join(`user_${socket.user.sub}`);
+    const userId = socket.user?.sub || socket.user?._id || socket.user?.id;
+    if (userId) {
+      socket.join(`user_${userId}`);
+      logger.info(`Socket ${socket.id} joined room: user_${userId}`);
 
       // If user is admin, join admin room for live activity monitoring
       if (socket.user.role === 'admin') {
         socket.join('admin_room');
+        logger.info(`Socket ${socket.id} joined admin_room`);
       }
     }
 
@@ -61,29 +65,61 @@ export const initSocket = (server, clientOrigin) => {
     });
 
     // 2. Trigger test notification to self
-    socket.on('trigger_test_notification', (data) => {
-      socket.emit('notification', {
+    socket.on('trigger_test_notification', async (data) => {
+      const notifData = {
         id: Date.now(),
         type: data?.type || 'TEST_ALERT',
         title: data?.title || 'Real-Time Alert',
         message: data?.message || '🧪 Real-time test alert triggered successfully via Socket.io!',
         createdAt: new Date().toISOString()
-      });
+      };
+
+      const userId = socket.user?.sub || socket.user?._id || socket.user?.id;
+      if (userId) {
+        try {
+          const dbNotif = await NotificationService.createNotification({
+            recipient: userId,
+            sender: userId,
+            type: data?.type || 'TEST_ALERT',
+            title: notifData.title,
+            message: notifData.message,
+            link: '/notifications'
+          });
+          notifData._id = dbNotif._id;
+        } catch {
+          // Socket fallback
+        }
+      }
+
+      socket.emit('notification', notifData);
     });
 
     // 3. Admin Global Broadcast
-    socket.on('trigger_admin_broadcast', (data) => {
+    socket.on('trigger_admin_broadcast', async (data) => {
       if (socket.user?.role !== 'admin') {
         return socket.emit('error_message', { message: 'Unauthorized: Admin role required for global broadcast' });
       }
 
-      io.emit('broadcast_announcement', {
-        id: Date.now(),
-        title: data?.title || 'System Announcement',
-        message: data?.message || 'This is a live real-time broadcast from the Admin Console.',
-        sender: socket.user?.name || 'Administrator',
-        createdAt: new Date().toISOString()
-      });
+      const userId = socket.user?.sub || socket.user?._id || socket.user?.id;
+      try {
+        await NotificationService.createNotification({
+          recipient: null, // Broadcast to all online users
+          sender: userId,
+          type: 'ANNOUNCEMENT',
+          title: data?.title || 'System Announcement',
+          message: data?.message || 'This is a live real-time broadcast from the Admin Console.',
+          link: '/notifications'
+        });
+      } catch (err) {
+        logger.error(`Broadcast announcement error: ${err.message}`);
+        io.emit('broadcast_announcement', {
+          id: Date.now(),
+          title: data?.title || 'System Announcement',
+          message: data?.message || 'This is a live real-time broadcast from the Admin Console.',
+          sender: socket.user?.name || 'Administrator',
+          createdAt: new Date().toISOString()
+        });
+      }
     });
 
     // 4. Simulate Activity Log for Admin Room

@@ -130,9 +130,11 @@ export const NotificationProvider = ({ children }) => {
     ]);
   }, []);
 
+  const userId = user?._id || user?.id;
+
   // Sync with MongoDB backend for authenticated users
   useEffect(() => {
-    if (!user?._id) return;
+    if (!userId) return;
 
     let isMounted = true;
     const fetchNotifications = async () => {
@@ -150,12 +152,12 @@ export const NotificationProvider = ({ children }) => {
     return () => {
       isMounted = false;
     };
-  }, [user?._id]);
+  }, [userId]);
 
   const markAllAsRead = async () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
     try {
-      if (user?._id) {
+      if (userId) {
         await api.patch('/notifications/read-all');
       }
     } catch {
@@ -167,7 +169,7 @@ export const NotificationProvider = ({ children }) => {
     setNotifications([]);
     try {
       localStorage.removeItem('app_notifications');
-      if (user?._id) {
+      if (userId) {
         await api.delete('/notifications');
       }
     } catch {
@@ -220,6 +222,18 @@ export const NotificationProvider = ({ children }) => {
     // Public post broadcast
     newSocket.on('new_post', (post) => {
       logEvent('RECEIVED', 'new_post', post);
+      const notifItem = {
+        _id: 'post_' + (post._id || Date.now()),
+        id: post._id || Date.now(),
+        type: 'POST_PUBLISHED',
+        title: 'New Article Published',
+        message: `New article published: "${post.title}"`,
+        slug: post.slug,
+        link: `/posts/${post.slug}`,
+        createdAt: post.createdAt || new Date().toISOString(),
+        read: false
+      };
+      setNotifications((prev) => [notifItem, ...prev]);
       showToast(`New article published: "${post.title}"`, 'success');
       playNotificationSound();
       triggerBrowserPush('Tech Exactly - New Article Published', post.title, `/posts/${post.slug}`);
@@ -229,6 +243,16 @@ export const NotificationProvider = ({ children }) => {
     newSocket.on('broadcast_announcement', (announcementData) => {
       logEvent('RECEIVED', 'broadcast_announcement', announcementData);
       setAnnouncement(announcementData);
+      const notifItem = {
+        _id: announcementData.id || announcementData._id || 'ann_' + Date.now(),
+        id: announcementData.id || announcementData._id || Date.now(),
+        type: 'ADMIN_BROADCAST',
+        title: announcementData.title || 'System Announcement',
+        message: announcementData.message,
+        createdAt: announcementData.createdAt || new Date().toISOString(),
+        read: false
+      };
+      setNotifications((prev) => [notifItem, ...prev]);
       showToast(`📢 Announcement: ${announcementData.title}`, 'warning', 6000);
       playNotificationSound();
       triggerBrowserPush(`📢 ${announcementData.title}`, announcementData.message, '/notifications');
@@ -237,10 +261,34 @@ export const NotificationProvider = ({ children }) => {
     // Real-time post deletion/restoration updates
     newSocket.on('post_deleted', (data) => {
       logEvent('RECEIVED', 'post_deleted', data);
+      const notifItem = {
+        _id: 'del_' + Date.now(),
+        id: Date.now(),
+        type: 'POST_DELETED',
+        title: 'Article Removed by Admin',
+        message: `Post "${data.title}" was soft-deleted by moderator.`,
+        createdAt: new Date().toISOString(),
+        read: false
+      };
+      setNotifications((prev) => [notifItem, ...prev]);
+      showToast(`⚠️ Post "${data.title}" was soft-deleted`, 'warning');
+      playNotificationSound();
     });
 
     newSocket.on('post_restored', (data) => {
       logEvent('RECEIVED', 'post_restored', data);
+      const notifItem = {
+        _id: 'res_' + Date.now(),
+        id: Date.now(),
+        type: 'POST_RESTORED',
+        title: 'Article Restored',
+        message: `Post "${data.title}" has been restored.`,
+        createdAt: new Date().toISOString(),
+        read: false
+      };
+      setNotifications((prev) => [notifItem, ...prev]);
+      showToast(`✅ Post "${data.title}" has been restored`, 'success');
+      playNotificationSound();
     });
 
     // Activity log event for admin room
@@ -251,7 +299,7 @@ export const NotificationProvider = ({ children }) => {
     return () => {
       newSocket.disconnect();
     };
-  }, [user?._id, logEvent, showToast, triggerBrowserPush, playNotificationSound]);
+  }, [userId, logEvent, showToast, triggerBrowserPush, playNotificationSound]);
 
   // Interactive Trigger Methods
   const sendPing = () => {

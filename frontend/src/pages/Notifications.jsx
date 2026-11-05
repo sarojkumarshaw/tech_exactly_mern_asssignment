@@ -39,7 +39,7 @@ export const Notifications = () => {
 
   const filteredNotifications = notifications.filter((n) => {
     if (activeFilter === 'unread') return !n.read;
-    if (activeFilter === 'announcements') return n.type === 'ANNOUNCEMENT';
+    if (activeFilter === 'announcements') return n.type === 'ANNOUNCEMENT' || n.type === 'ADMIN_BROADCAST';
     return true;
   });
 
@@ -54,10 +54,14 @@ export const Notifications = () => {
   const getTypeIcon = (type) => {
     switch (type) {
       case 'ANNOUNCEMENT':
+      case 'ADMIN_BROADCAST':
         return <Megaphone className="w-5 h-5 text-amber-500" />;
       case 'COMMENT':
+      case 'COMMENT_ON_POST':
+      case 'COMMENT_POSTED':
         return <MessageSquare className="w-5 h-5 text-emerald-500" />;
       case 'POST':
+      case 'POST_PUBLISHED':
         return <FileText className="w-5 h-5 text-blue-500" />;
       default:
         return <Bell className="w-5 h-5 text-indigo-500" />;
@@ -67,10 +71,14 @@ export const Notifications = () => {
   const getTypeBadge = (type) => {
     switch (type) {
       case 'ANNOUNCEMENT':
+      case 'ADMIN_BROADCAST':
         return 'bg-amber-50 text-amber-700 border-amber-200';
       case 'COMMENT':
+      case 'COMMENT_ON_POST':
+      case 'COMMENT_POSTED':
         return 'bg-emerald-50 text-emerald-700 border-emerald-200';
       case 'POST':
+      case 'POST_PUBLISHED':
         return 'bg-blue-50 text-blue-700 border-blue-200';
       default:
         return 'bg-indigo-50 text-indigo-700 border-indigo-200';
