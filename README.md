@@ -268,3 +268,14 @@ All endpoints are versioned under `/api/v1`.
 | **Security & Optimization** | Bcrypt hashing (12 rounds), dual JWT token rotation, Helmet security headers, rate limiting, XSS sanitization, compound indexes, lean queries. |
 | **Documentation & Reusability** | Detailed `COMMANDS.md` for replication, thorough `README.md`, pre-configured seeder script, and 15 Jest tests. |
 
+---
+
+## Video Walkthrough & Presentation Script
+
+An automated high-definition walkthrough demonstrating all core features, branding, OAuth 2.0 social logins, real-time notification hub, and admin broadcast controls has been generated:
+
+- **Recorded Video File**: [`demo_video/tech_exactly_mern_assignment_walkthrough.webm`](file:///d:/nodereact/mern_assignment/demo_video/tech_exactly_mern_assignment_walkthrough.webm)
+- **Alternate Mirror**: [`demo_video/devsphere_mern_demo_walkthrough.webm`](file:///d:/nodereact/mern_assignment/demo_video/devsphere_mern_demo_walkthrough.webm)
+- **Step-by-Step Script**: [`DEMO_SCRIPT.md`](file:///d:/nodereact/mern_assignment/DEMO_SCRIPT.md) (10 scenes with on-screen HUD descriptions)
+
+
