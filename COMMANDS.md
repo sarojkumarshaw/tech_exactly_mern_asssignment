@@ -159,16 +159,33 @@ node src/seeds/seed.js
 
 ---
 
-## 6. Running Integration Tests (Jest)
+## 6. Running Automated Tests
 
-Execute the 15-test integration suite covering Auth, Posts CRUD, Soft Deletion, Comments, and RBAC:
-
+### A. Run Entire Full-Stack Test Suite (Backend + Frontend)
 ```powershell
 # From project root:
-npm.cmd test
+npm.cmd run test:all
+```
+
+### B. Run Backend Integration Tests (Jest + Supertest)
+Executes 15 integration tests covering Auth, Posts CRUD, Soft Deletion, Comments, and RBAC:
+```powershell
+# From project root:
+npm.cmd run test:backend
 
 # OR inside the backend folder:
 cd backend
+npm.cmd test
+```
+
+### C. Run Frontend Component Tests (Vitest + React Testing Library)
+Executes 29 unit and component integration tests covering TechExactlyLogo, PostCard, Navbar, Footer, ProtectedRoute, AdminRoute, Pagination, and CommentSection:
+```powershell
+# From project root:
+npm.cmd run test:frontend
+
+# OR inside the frontend folder:
+cd frontend
 npm.cmd test
 ```
 

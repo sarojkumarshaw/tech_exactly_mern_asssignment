@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const TechExactlyLogo = ({ size = 'md', showTag = true, className = '' }) => {
+export const TechExactlyLogo = ({ size = 'md', showTag = true, showText = true, className = '' }) => {
   const iconSizes = {
     sm: 'w-7 h-7',
     md: 'w-9 h-9',
@@ -46,21 +46,23 @@ export const TechExactlyLogo = ({ size = 'md', showTag = true, className = '' })
       </div>
 
       {/* Brand Wordmark */}
-      <div className="flex flex-col text-left leading-none">
-        <div className="flex items-center gap-1.5">
-          <span className={`font-black ${textSizes[size]} tracking-tight text-slate-900`}>
-            Tech<span className="text-blue-600">Exactly</span>
-          </span>
-          {showTag && (
-            <span className="hidden sm:inline-block px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-blue-700 bg-blue-50 border border-blue-200/80 rounded-md">
-              Assignment
+      {showText && (
+        <div className="flex flex-col text-left leading-none">
+          <div className="flex items-center gap-1.5">
+            <span className={`font-black ${textSizes[size]} tracking-tight text-slate-900`}>
+              Tech<span className="text-blue-600">Exactly</span>
             </span>
-          )}
+            {showTag && (
+              <span className="hidden sm:inline-block px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-blue-700 bg-blue-50 border border-blue-200/80 rounded-md">
+                Assignment
+              </span>
+            )}
+          </div>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-600 mt-0.5">
+            MERN Blog Platform
+          </span>
         </div>
-        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-600 mt-0.5">
-          MERN Blog Platform
-        </span>
-      </div>
+      )}
     </div>
   );
 };

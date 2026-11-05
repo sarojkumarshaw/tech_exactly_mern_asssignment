@@ -185,9 +185,16 @@ Pre-populates sample administrators, regular users, rich articles, soft-deleted 
 npm.cmd run seed
 ```
 
-### 4. Run Integration Tests
+### 4. Run Automated Tests
 ```powershell
-npm.cmd test
+# Run entire test suite (Backend Jest + Frontend Vitest):
+npm.cmd run test:all
+
+# Or run backend integration tests individually:
+npm.cmd run test:backend
+
+# Or run frontend component tests individually:
+npm.cmd run test:frontend
 ```
 
 ### 5. Start Development Servers
