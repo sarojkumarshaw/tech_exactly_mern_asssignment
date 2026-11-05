@@ -79,7 +79,14 @@ export const getMe = asyncHandler(async (req, res) => {
  * Initiate Google OAuth 2.0 via Passport.js
  */
 export const googleAuth = (req, res, next) => {
-  if (passport._strategies && passport._strategies.google) {
+  const isLiveRequest = req.query.live === 'true' || req.query.redirect === 'true';
+  const hasRealKeys =
+    env.GOOGLE_CLIENT_ID &&
+    !env.GOOGLE_CLIENT_ID.includes('your-google-client-id') &&
+    env.GOOGLE_CLIENT_SECRET &&
+    !env.GOOGLE_CLIENT_SECRET.includes('your-google-client-secret');
+
+  if (isLiveRequest || hasRealKeys) {
     return passport.authenticate('google', {
       scope: ['profile', 'email'],
       session: false
@@ -146,7 +153,14 @@ export const googleCallback = (req, res, next) => {
  * Initiate Facebook OAuth 2.0 via Passport.js
  */
 export const facebookAuth = (req, res, next) => {
-  if (passport._strategies && passport._strategies.facebook) {
+  const isLiveRequest = req.query.live === 'true' || req.query.redirect === 'true';
+  const hasRealKeys =
+    env.FACEBOOK_APP_ID &&
+    !env.FACEBOOK_APP_ID.includes('your-facebook-app-id') &&
+    env.FACEBOOK_APP_SECRET &&
+    !env.FACEBOOK_APP_SECRET.includes('your-facebook-app-secret');
+
+  if (isLiveRequest || hasRealKeys) {
     return passport.authenticate('facebook', {
       scope: ['email'],
       session: false

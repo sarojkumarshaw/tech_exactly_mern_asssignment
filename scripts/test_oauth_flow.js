@@ -13,7 +13,7 @@ async function testOAuthFlow() {
   await page.goto('http://localhost:5173/login', { waitUntil: 'networkidle' });
 
   console.log('2. Clicking Google OAuth 2.0 button (initiating /api/v1/auth/google)...');
-  const googleBtn = page.locator('button:has-text("Google")');
+  const googleBtn = page.getByRole('button', { name: 'Google', exact: true });
   await googleBtn.click();
 
   // Wait for redirect to /oauth-callback and then to /
@@ -38,7 +38,7 @@ async function testOAuthFlow() {
   await page.goto('http://localhost:5173/login', { waitUntil: 'networkidle' });
 
   console.log('8. Clicking Facebook OAuth 2.0 button (initiating /api/v1/auth/facebook)...');
-  const fbBtn = page.locator('button:has-text("Facebook")');
+  const fbBtn = page.getByRole('button', { name: 'Facebook', exact: true });
   await fbBtn.click();
 
   console.log('9. Waiting for Facebook OAuth 2.0 callback processing...');
@@ -58,3 +58,4 @@ testOAuthFlow().catch((err) => {
   console.error('Test failed with error:', err);
   process.exit(1);
 });
+

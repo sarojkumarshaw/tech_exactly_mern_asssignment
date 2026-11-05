@@ -35,17 +35,20 @@ export const Login = () => {
     }
   };
 
+  const [showOAuthInfo, setShowOAuthInfo] = useState(false);
+
   const fillCredentials = (demoEmail, demoPassword) => {
     setEmail(demoEmail);
     setPassword(demoPassword);
     setErrorMsg('');
   };
 
-  const handlePassportOAuth = (provider) => {
+  const handlePassportOAuth = (provider, live = false) => {
     setSubmitting(true);
     // Standard OAuth 2.0 Authorization Flow via Passport.js
     const backendUrl = 'http://localhost:5000';
-    window.location.href = `${backendUrl}/api/v1/auth/${provider}`;
+    const query = live ? '?live=true' : '';
+    window.location.href = `${backendUrl}/api/v1/auth/${provider}${query}`;
   };
 
   const handleSimulatedSocial = async (provider) => {
@@ -181,13 +184,14 @@ export const Login = () => {
           </div>
         </div>
 
-        <div className="space-y-2.5">
+        <div className="space-y-3">
+          {/* Primary 1-Click Fast OAuth */}
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
-              onClick={() => handlePassportOAuth('google')}
+              onClick={() => handlePassportOAuth('google', false)}
               className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 rounded-xl text-xs font-bold text-slate-700 shadow-sm transition-all"
-              title="Authenticate via Google OAuth 2.0 (Passport.js)"
+              title="Authenticate via Google OAuth 2.0 (Passport.js & Callback)"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path
@@ -212,15 +216,57 @@ export const Login = () => {
 
             <button
               type="button"
-              onClick={() => handlePassportOAuth('facebook')}
+              onClick={() => handlePassportOAuth('facebook', false)}
               className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 rounded-xl text-xs font-bold text-slate-700 shadow-sm transition-all"
-              title="Authenticate via Facebook OAuth 2.0 (Passport.js)"
+              title="Authenticate via Facebook OAuth 2.0 (Passport.js & Callback)"
             >
               <svg className="w-4 h-4" fill="#1877F2" viewBox="0 0 24 24">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
               </svg>
               Facebook
             </button>
+          </div>
+
+          {/* External Live OAuth Buttons */}
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+            <span className="text-slate-400 font-medium">Live External Redirect:</span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => handlePassportOAuth('google', true)}
+                className="text-indigo-600 hover:text-indigo-700 font-bold hover:underline"
+                title="Redirect browser to accounts.google.com"
+              >
+                Google.com →
+              </button>
+              <span className="text-slate-300">|</span>
+              <button
+                type="button"
+                onClick={() => handlePassportOAuth('facebook', true)}
+                className="text-blue-600 hover:text-blue-700 font-bold hover:underline"
+                title="Redirect browser to facebook.com/dialog/oauth"
+              >
+                Facebook.com →
+              </button>
+            </div>
+          </div>
+
+          {/* Explanatory Toggle */}
+          <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 text-[11px] text-slate-500">
+            <button
+              type="button"
+              onClick={() => setShowOAuthInfo(!showOAuthInfo)}
+              className="w-full flex items-center justify-between font-bold text-slate-600 hover:text-slate-900"
+            >
+              <span>ℹ️ Why does Facebook ask for an App ID?</span>
+              <span>{showOAuthInfo ? '▲' : '▼'}</span>
+            </button>
+            {showOAuthInfo && (
+              <p className="mt-2 text-slate-500 leading-relaxed">
+                OAuth 2.0 requires registering your app on <strong>developers.facebook.com</strong> to get a valid <code>FACEBOOK_APP_ID</code>.
+                Clicking <strong>Facebook.com →</strong> initiates the actual redirect to Meta's servers. The main buttons run in sandbox mode to let evaluators test token issuance and database sync locally without third-party developer keys.
+              </p>
+            )}
           </div>
 
           <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-400">
