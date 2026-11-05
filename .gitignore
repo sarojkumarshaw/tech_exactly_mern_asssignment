@@ -31,8 +31,9 @@ coverage/
 .DS_Store
 Thumbs.db
 
-# Local scripts
+# Local scripts & internal notes
 scripts/
+DEMO_SCRIPT.md
 
 
 # IDE & Editor caches
