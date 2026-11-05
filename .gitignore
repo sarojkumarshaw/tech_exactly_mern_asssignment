@@ -34,7 +34,13 @@ Thumbs.db
 # Local scripts & internal notes
 scripts/
 DEMO_SCRIPT.md
-
+scratch/
+*.png
+*.jpg
+*.jpeg
+*.mp4
+*.webm
+*.gif
 
 # IDE & Editor caches
 .vscode/
