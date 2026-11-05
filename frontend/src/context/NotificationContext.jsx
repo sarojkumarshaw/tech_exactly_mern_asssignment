@@ -212,19 +212,26 @@ export const NotificationProvider = ({ children }) => {
     // Targeted notification event (e.g. comment on user's post, admin moderation)
     newSocket.on('notification', (data) => {
       logEvent('RECEIVED', 'notification', data);
-      setNotifications((prev) => [{ ...data, id: Date.now(), read: false }, ...prev]);
+      const itemId = data._id || data.id || Date.now();
+      setNotifications((prev) => {
+        if (prev.some((n) => (n._id && n._id === itemId) || (n.id && n.id === itemId))) {
+          return prev;
+        }
+        return [{ ...data, id: itemId, read: false }, ...prev];
+      });
       showToast(data.message, 'info');
       playNotificationSound();
-      const targetUrl = data.slug ? `/posts/${data.slug}` : '/notifications';
+      const targetUrl = data.slug ? `/posts/${data.slug}` : (data.link || '/notifications');
       triggerBrowserPush(data.title || 'Tech Exactly - New Notification', data.message, targetUrl);
     });
 
     // Public post broadcast
     newSocket.on('new_post', (post) => {
       logEvent('RECEIVED', 'new_post', post);
+      const itemId = post._id || Date.now();
       const notifItem = {
-        _id: 'post_' + (post._id || Date.now()),
-        id: post._id || Date.now(),
+        _id: 'post_' + itemId,
+        id: itemId,
         type: 'POST_PUBLISHED',
         title: 'New Article Published',
         message: `New article published: "${post.title}"`,
@@ -233,7 +240,12 @@ export const NotificationProvider = ({ children }) => {
         createdAt: post.createdAt || new Date().toISOString(),
         read: false
       };
-      setNotifications((prev) => [notifItem, ...prev]);
+      setNotifications((prev) => {
+        if (prev.some((n) => n.slug === post.slug || (n._id && n._id === notifItem._id))) {
+          return prev;
+        }
+        return [notifItem, ...prev];
+      });
       showToast(`New article published: "${post.title}"`, 'success');
       playNotificationSound();
       triggerBrowserPush('Tech Exactly - New Article Published', post.title, `/posts/${post.slug}`);
@@ -243,16 +255,22 @@ export const NotificationProvider = ({ children }) => {
     newSocket.on('broadcast_announcement', (announcementData) => {
       logEvent('RECEIVED', 'broadcast_announcement', announcementData);
       setAnnouncement(announcementData);
+      const itemId = announcementData._id || announcementData.id || 'ann_' + Date.now();
       const notifItem = {
-        _id: announcementData.id || announcementData._id || 'ann_' + Date.now(),
-        id: announcementData.id || announcementData._id || Date.now(),
+        _id: itemId,
+        id: itemId,
         type: 'ADMIN_BROADCAST',
         title: announcementData.title || 'System Announcement',
         message: announcementData.message,
         createdAt: announcementData.createdAt || new Date().toISOString(),
         read: false
       };
-      setNotifications((prev) => [notifItem, ...prev]);
+      setNotifications((prev) => {
+        if (prev.some((n) => (n._id && n._id === itemId) || (n.id && n.id === itemId))) {
+          return prev;
+        }
+        return [notifItem, ...prev];
+      });
       showToast(`📢 Announcement: ${announcementData.title}`, 'warning', 6000);
       playNotificationSound();
       triggerBrowserPush(`📢 ${announcementData.title}`, announcementData.message, '/notifications');
@@ -312,31 +330,37 @@ export const NotificationProvider = ({ children }) => {
     logEvent('SENT', 'client_ping', payload);
   };
 
-  const sendTestNotification = (customMsg, type = 'TEST_ALERT', title = 'Live Notification') => {
+  const sendTestNotification = (customMsg, type = 'TEST_ALERT', title = 'Live Notification', options = {}) => {
     if (!socket || !socket.connected) {
       showToast('Socket not connected', 'error');
       return;
     }
+    const isBroadcast = options.broadcast ?? (user?.role === 'admin');
     const payload = {
       message: customMsg || '🧪 Testing live Socket.io notification!',
       type,
-      title
+      title,
+      broadcast: isBroadcast,
+      target: options.target || (isBroadcast ? 'all' : 'self')
     };
     socket.emit('trigger_test_notification', payload);
     logEvent('SENT', 'trigger_test_notification', payload);
   };
 
-  const sendAdminBroadcast = (title, message) => {
-    if (!socket || !socket.connected) {
-      showToast('Socket not connected', 'error');
-      return;
-    }
+  const sendAdminBroadcast = async (title, message) => {
     const payload = {
       title: title || 'Live System Announcement',
       message: message || 'Broadcasting real-time alert to all connected users!'
     };
-    socket.emit('trigger_admin_broadcast', payload);
-    logEvent('SENT', 'trigger_admin_broadcast', payload);
+    try {
+      await api.post('/admin/broadcast', payload);
+      logEvent('SENT', 'admin_broadcast_api', payload);
+    } catch {
+      if (socket && socket.connected) {
+        socket.emit('trigger_admin_broadcast', payload);
+        logEvent('SENT', 'trigger_admin_broadcast', payload);
+      }
+    }
   };
 
   const sendSimulatedActivity = (action) => {

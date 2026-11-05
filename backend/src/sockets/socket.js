@@ -64,7 +64,7 @@ export const initSocket = (server, clientOrigin) => {
       });
     });
 
-    // 2. Trigger test notification to self
+    // 2. Trigger notification (Supports both Global Broadcast and Self-Test)
     socket.on('trigger_test_notification', async (data) => {
       const notifData = {
         id: Date.now(),
@@ -75,12 +75,15 @@ export const initSocket = (server, clientOrigin) => {
       };
 
       const userId = socket.user?.sub || socket.user?._id || socket.user?.id;
-      if (userId) {
+      const isBroadcast = data?.broadcast === true || data?.target === 'all' || socket.user?.role === 'admin';
+
+      if (isBroadcast) {
+        // Broadcast to ALL users (Admin + Regular Users) and persist to MongoDB
         try {
           const dbNotif = await NotificationService.createNotification({
-            recipient: userId,
-            sender: userId,
-            type: data?.type || 'TEST_ALERT',
+            recipient: null, // Global
+            sender: userId || null,
+            type: data?.type || 'ANNOUNCEMENT',
             title: notifData.title,
             message: notifData.message,
             link: '/notifications'
@@ -89,9 +92,34 @@ export const initSocket = (server, clientOrigin) => {
         } catch {
           // Socket fallback
         }
-      }
 
-      socket.emit('notification', notifData);
+        io.emit('notification', notifData);
+        io.emit('broadcast_announcement', {
+          id: notifData._id || notifData.id,
+          title: notifData.title,
+          message: notifData.message,
+          sender: socket.user?.name || 'Administrator',
+          createdAt: notifData.createdAt
+        });
+      } else {
+        // Self-test for single client
+        if (userId) {
+          try {
+            const dbNotif = await NotificationService.createNotification({
+              recipient: userId,
+              sender: userId,
+              type: data?.type || 'TEST_ALERT',
+              title: notifData.title,
+              message: notifData.message,
+              link: '/notifications'
+            });
+            notifData._id = dbNotif._id;
+          } catch {
+            // Socket fallback
+          }
+        }
+        socket.emit('notification', notifData);
+      }
     });
 
     // 3. Admin Global Broadcast
@@ -102,7 +130,7 @@ export const initSocket = (server, clientOrigin) => {
 
       const userId = socket.user?.sub || socket.user?._id || socket.user?.id;
       try {
-        await NotificationService.createNotification({
+        const notif = await NotificationService.createNotification({
           recipient: null, // Broadcast to all online users
           sender: userId,
           type: 'ANNOUNCEMENT',
@@ -110,15 +138,19 @@ export const initSocket = (server, clientOrigin) => {
           message: data?.message || 'This is a live real-time broadcast from the Admin Console.',
           link: '/notifications'
         });
+        io.emit('notification', notif);
       } catch (err) {
         logger.error(`Broadcast announcement error: ${err.message}`);
-        io.emit('broadcast_announcement', {
+        const fallback = {
           id: Date.now(),
+          type: 'ANNOUNCEMENT',
           title: data?.title || 'System Announcement',
           message: data?.message || 'This is a live real-time broadcast from the Admin Console.',
           sender: socket.user?.name || 'Administrator',
           createdAt: new Date().toISOString()
-        });
+        };
+        io.emit('broadcast_announcement', fallback);
+        io.emit('notification', fallback);
       }
     });
 
