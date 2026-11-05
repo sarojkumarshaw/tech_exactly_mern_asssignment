@@ -107,3 +107,4 @@ describe('AdminRoute Component', () => {
     expect(screen.getByText('Admin Management Dashboard')).toBeInTheDocument();
   });
 });
+

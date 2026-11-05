@@ -28,3 +28,4 @@ describe('Footer Component', () => {
     expect(screen.getByText(/for Tech Exactly Assignment/i)).toBeInTheDocument();
   });
 });
+

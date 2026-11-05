@@ -54,3 +54,4 @@ describe('Pagination Component', () => {
     expect(screen.getByText('Next').closest('button')).toBeDisabled();
   });
 });
+

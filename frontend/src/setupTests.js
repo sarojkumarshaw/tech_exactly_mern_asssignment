@@ -17,3 +17,4 @@ Object.defineProperty(window, 'matchMedia', {
 
 // Mock window.scrollTo
 window.scrollTo = () => {};
+

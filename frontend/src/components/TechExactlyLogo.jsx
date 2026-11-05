@@ -24,7 +24,7 @@ export const TechExactlyLogo = ({ size = 'md', showTag = true, showText = true, 
         <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center relative overflow-hidden">
           {/* Subtle background glow */}
           <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/30 via-transparent to-cyan-400/20" />
-          
+
           {/* Custom SVG Precision Monogram */}
           <svg
             className="w-3/5 h-3/5 text-white relative z-10"

@@ -27,3 +27,4 @@ describe('TechExactlyLogo Component', () => {
     expect(rootDiv).toHaveClass('custom-test-class');
   });
 });
+

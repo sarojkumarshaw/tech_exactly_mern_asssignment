@@ -89,3 +89,4 @@ describe('PostCard Component', () => {
     expect(screen.getByText('Bob Smith')).toBeInTheDocument();
   });
 });
+
