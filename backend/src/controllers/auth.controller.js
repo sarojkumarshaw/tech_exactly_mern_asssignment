@@ -77,45 +77,40 @@ export const getMe = asyncHandler(async (req, res) => {
 
 /**
  * Initiate Google OAuth 2.0 via Passport.js
+ * Redirects user to accounts.google.com for real authentication
  */
 export const googleAuth = (req, res, next) => {
-  const isLiveRequest = req.query.live === 'true' || req.query.redirect === 'true';
-  const hasRealKeys =
-    env.GOOGLE_CLIENT_ID &&
-    !env.GOOGLE_CLIENT_ID.includes('your-google-client-id') &&
-    env.GOOGLE_CLIENT_SECRET &&
-    !env.GOOGLE_CLIENT_SECRET.includes('your-google-client-secret');
-
-  if (isLiveRequest || hasRealKeys) {
-    return passport.authenticate('google', {
-      scope: ['profile', 'email'],
-      session: false
-    })(req, res, next);
+  // Only use simulation if explicitly requested via ?demo=true
+  if (req.query.demo === 'true') {
+    return AuthService.findOrCreateSocialUser(
+      {
+        provider: 'google',
+        providerId: `google_oauth_sub_${Date.now()}`,
+        email: 'google.oauth.demo@example.com',
+        name: 'Google OAuth Verified',
+        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
+      },
+      req
+    )
+      .then(({ tokens }) => {
+        res.cookie('refreshToken', tokens.refreshToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+        return res.redirect(
+          `${env.CLIENT_URL}/oauth-callback?token=${tokens.accessToken}&refreshToken=${tokens.refreshToken}&provider=google`
+        );
+      })
+      .catch(next);
   }
 
-  // Graceful simulation redirect for environments without Google API Console secrets configured
-  return AuthService.findOrCreateSocialUser(
-    {
-      provider: 'google',
-      providerId: `google_oauth_sub_${Date.now()}`,
-      email: 'google.oauth.user@example.com',
-      name: 'Google OAuth Verified',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
-    },
-    req
-  )
-    .then(({ tokens }) => {
-      res.cookie('refreshToken', tokens.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000
-      });
-      return res.redirect(
-        `${env.CLIENT_URL}/oauth-callback?token=${tokens.accessToken}&refreshToken=${tokens.refreshToken}&provider=google`
-      );
-    })
-    .catch(next);
+  // Real OAuth 2.0 via Passport.js -> Redirects browser to accounts.google.com
+  return passport.authenticate('google', {
+    scope: ['profile', 'email'],
+    session: false
+  })(req, res, next);
 };
 
 /**
@@ -151,45 +146,40 @@ export const googleCallback = (req, res, next) => {
 
 /**
  * Initiate Facebook OAuth 2.0 via Passport.js
+ * Redirects user to facebook.com for real authentication
  */
 export const facebookAuth = (req, res, next) => {
-  const isLiveRequest = req.query.live === 'true' || req.query.redirect === 'true';
-  const hasRealKeys =
-    env.FACEBOOK_APP_ID &&
-    !env.FACEBOOK_APP_ID.includes('your-facebook-app-id') &&
-    env.FACEBOOK_APP_SECRET &&
-    !env.FACEBOOK_APP_SECRET.includes('your-facebook-app-secret');
-
-  if (isLiveRequest || hasRealKeys) {
-    return passport.authenticate('facebook', {
-      scope: ['email'],
-      session: false
-    })(req, res, next);
+  // Only use simulation if explicitly requested via ?demo=true
+  if (req.query.demo === 'true') {
+    return AuthService.findOrCreateSocialUser(
+      {
+        provider: 'facebook',
+        providerId: `facebook_oauth_sub_${Date.now()}`,
+        email: 'facebook.oauth.demo@example.com',
+        name: 'Facebook OAuth Verified',
+        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150'
+      },
+      req
+    )
+      .then(({ tokens }) => {
+        res.cookie('refreshToken', tokens.refreshToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+        return res.redirect(
+          `${env.CLIENT_URL}/oauth-callback?token=${tokens.accessToken}&refreshToken=${tokens.refreshToken}&provider=facebook`
+        );
+      })
+      .catch(next);
   }
 
-  // Graceful simulation redirect for environments without Facebook App secrets configured
-  return AuthService.findOrCreateSocialUser(
-    {
-      provider: 'facebook',
-      providerId: `facebook_oauth_sub_${Date.now()}`,
-      email: 'facebook.oauth.user@example.com',
-      name: 'Facebook OAuth Verified',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150'
-    },
-    req
-  )
-    .then(({ tokens }) => {
-      res.cookie('refreshToken', tokens.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000
-      });
-      return res.redirect(
-        `${env.CLIENT_URL}/oauth-callback?token=${tokens.accessToken}&refreshToken=${tokens.refreshToken}&provider=facebook`
-      );
-    })
-    .catch(next);
+  // Real OAuth 2.0 via Passport.js -> Redirects browser to facebook.com
+  return passport.authenticate('facebook', {
+    scope: ['email'],
+    session: false
+  })(req, res, next);
 };
 
 /**
