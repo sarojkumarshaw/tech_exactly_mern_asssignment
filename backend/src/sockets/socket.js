@@ -64,7 +64,8 @@ export const initSocket = (server, clientOrigin) => {
     socket.on('trigger_test_notification', (data) => {
       socket.emit('notification', {
         id: Date.now(),
-        type: 'TEST_ALERT',
+        type: data?.type || 'TEST_ALERT',
+        title: data?.title || 'Real-Time Alert',
         message: data?.message || '🧪 Real-time test alert triggered successfully via Socket.io!',
         createdAt: new Date().toISOString()
       });

@@ -13,7 +13,23 @@ export const NotificationProvider = ({ children }) => {
   const [eventLogs, setEventLogs] = useState([]);
   const [announcement, setAnnouncement] = useState(null);
 
-  const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState(() => {
+    try {
+      const saved = localStorage.getItem('app_notifications');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('app_notifications', JSON.stringify(notifications));
+    } catch {
+      // ignore
+    }
+  }, [notifications]);
+
   const [toasts, setToasts] = useState([]);
   const [desktopPermission, setDesktopPermission] = useState(() => {
     return typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'unsupported';
@@ -119,6 +135,11 @@ export const NotificationProvider = ({ children }) => {
 
   const clearNotifications = () => {
     setNotifications([]);
+    try {
+      localStorage.removeItem('app_notifications');
+    } catch {
+      // ignore
+    }
   };
 
   const clearEventLogs = () => {
@@ -210,12 +231,16 @@ export const NotificationProvider = ({ children }) => {
     logEvent('SENT', 'client_ping', payload);
   };
 
-  const sendTestNotification = (customMsg) => {
+  const sendTestNotification = (customMsg, type = 'TEST_ALERT', title = 'Live Notification') => {
     if (!socket || !socket.connected) {
       showToast('Socket not connected', 'error');
       return;
     }
-    const payload = { message: customMsg || '🧪 Testing live Socket.io notification!' };
+    const payload = {
+      message: customMsg || '🧪 Testing live Socket.io notification!',
+      type,
+      title
+    };
     socket.emit('trigger_test_notification', payload);
     logEvent('SENT', 'trigger_test_notification', payload);
   };

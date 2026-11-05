@@ -33,7 +33,7 @@ export class CommentService {
       details: { postId, postTitle: post.title }
     });
 
-    // Real-time notification to post author (if not commenting on own post)
+    // Real-time notification to post author and commenter
     try {
       const io = getSocketIO();
       if (io) {
@@ -41,10 +41,22 @@ export class CommentService {
         io.to(`post_${postId}`).emit('new_comment', populatedComment);
 
         // Targeted notification to post author
-        if (post.author.toString() !== authorUser._id.toString()) {
-          io.to(`user_${post.author.toString()}`).emit('notification', {
-            type: 'COMMENT_ON_POST',
-            message: `${authorUser.name} commented on your post "${post.title}"`,
+        io.to(`user_${post.author.toString()}`).emit('notification', {
+          type: 'COMMENT_ON_POST',
+          title: 'New Comment',
+          message: `${authorUser.name} commented on your post "${post.title}"`,
+          postId: post._id,
+          slug: post.slug,
+          commentId: comment._id,
+          createdAt: comment.createdAt
+        });
+
+        // Also emit notification to commenter if different, so both users experience real-time push feedback
+        if (authorUser._id.toString() !== post.author.toString()) {
+          io.to(`user_${authorUser._id.toString()}`).emit('notification', {
+            type: 'COMMENT_POSTED',
+            title: 'Comment Published',
+            message: `Your comment was posted on "${post.title}"`,
             postId: post._id,
             slug: post.slug,
             commentId: comment._id,

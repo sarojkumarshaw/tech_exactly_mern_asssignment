@@ -297,7 +297,7 @@ export const Notifications = () => {
             <div className="pt-3 border-t border-slate-100 space-y-2">
               <button
                 type="button"
-                onClick={() => sendTestNotification('🚀 Jane Doe commented on your post "Getting Started with MERN"!')}
+                onClick={() => sendTestNotification('🚀 Jane Doe commented on your post "Getting Started with MERN"!', 'COMMENT', 'New Comment on Your Article')}
                 className="w-full text-left px-3 py-2 bg-slate-50 hover:bg-slate-100 rounded-xl text-xs text-slate-700 font-semibold transition-colors flex items-center justify-between"
               >
                 <span>Scenario 1: Comment On Post</span>
@@ -305,7 +305,7 @@ export const Notifications = () => {
               </button>
               <button
                 type="button"
-                onClick={() => sendTestNotification('✍️ New article published: "Architecting Scalable Microservices with Node.js"')}
+                onClick={() => sendTestNotification('✍️ New article published: "Architecting Scalable Microservices with Node.js"', 'POST', 'New Article Published')}
                 className="w-full text-left px-3 py-2 bg-slate-50 hover:bg-slate-100 rounded-xl text-xs text-slate-700 font-semibold transition-colors flex items-center justify-between"
               >
                 <span>Scenario 2: New Article Published</span>
@@ -313,7 +313,7 @@ export const Notifications = () => {
               </button>
               <button
                 type="button"
-                onClick={() => sendTestNotification('📢 Tech Exactly Assignment evaluation live broadcast alert')}
+                onClick={() => sendTestNotification('📢 Tech Exactly Assignment evaluation live broadcast alert', 'ANNOUNCEMENT', 'System Broadcast')}
                 className="w-full text-left px-3 py-2 bg-slate-50 hover:bg-slate-100 rounded-xl text-xs text-slate-700 font-semibold transition-colors flex items-center justify-between"
               >
                 <span>Scenario 3: System Broadcast</span>
@@ -321,7 +321,7 @@ export const Notifications = () => {
               </button>
               <button
                 type="button"
-                onClick={() => sendTestNotification('🛡️ Administrator moderated post: "Clean Architecture in React"')}
+                onClick={() => sendTestNotification('🛡️ Administrator moderated post: "Clean Architecture in React"', 'SYSTEM', 'Post Moderated')}
                 className="w-full text-left px-3 py-2 bg-slate-50 hover:bg-slate-100 rounded-xl text-xs text-slate-700 font-semibold transition-colors flex items-center justify-between"
               >
                 <span>Scenario 4: Post Moderated</span>
