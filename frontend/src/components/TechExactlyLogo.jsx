@@ -66,3 +66,4 @@ export const TechExactlyLogo = ({ size = 'md', showTag = true, className = '' })
 };
 
 export default TechExactlyLogo;
+

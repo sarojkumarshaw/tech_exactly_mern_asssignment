@@ -401,8 +401,8 @@ export const AdminDashboard = () => {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-5 py-3 text-xs sm:text-sm font-bold border-b-2 transition-all whitespace-nowrap ${isActive
-                  ? 'border-indigo-600 text-indigo-600'
-                  : 'border-transparent text-slate-500 hover:text-slate-800'
+                ? 'border-indigo-600 text-indigo-600'
+                : 'border-transparent text-slate-500 hover:text-slate-800'
                 }`}
             >
               <Icon className="w-4 h-4" />
@@ -577,8 +577,8 @@ export const AdminDashboard = () => {
                     <td className="py-4 px-6">
                       <span
                         className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase ${u.role === 'admin'
-                            ? 'bg-amber-100 text-amber-800'
-                            : 'bg-slate-100 text-slate-700'
+                          ? 'bg-amber-100 text-amber-800'
+                          : 'bg-slate-100 text-slate-700'
                           }`}
                       >
                         {u.role}
@@ -609,8 +609,8 @@ export const AdminDashboard = () => {
                           <button
                             onClick={() => handleToggleUserStatus(u)}
                             className={`px-2.5 py-1 text-[11px] font-bold rounded-lg border ${u.isActive
-                                ? 'text-rose-600 bg-rose-50 border-rose-200 hover:bg-rose-100'
-                                : 'text-emerald-700 bg-emerald-50 border-emerald-200 hover:bg-emerald-100'
+                              ? 'text-rose-600 bg-rose-50 border-rose-200 hover:bg-rose-100'
+                              : 'text-emerald-700 bg-emerald-50 border-emerald-200 hover:bg-emerald-100'
                               }`}
                           >
                             {u.isActive ? 'Suspend' : 'Activate'}
@@ -656,8 +656,8 @@ export const AdminDashboard = () => {
                     setPostPage(1);
                   }}
                   className={`px-3 py-1.5 text-xs font-bold rounded-xl capitalize transition-all ${postStatusFilter === status
-                      ? 'bg-indigo-600 text-white shadow-sm'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    ? 'bg-indigo-600 text-white shadow-sm'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                 >
                   {status}

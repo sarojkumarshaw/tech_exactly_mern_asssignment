@@ -32,17 +32,13 @@ async function testOAuthFlow() {
   ]);
   console.log('6. Successfully navigated to real Facebook OAuth URL:', page.url().substring(0, 60) + '...');
 
-  // Test 3: Demo Mode Token Exchange & Session Creation
-  console.log('7. Navigating back to Login for Token & Session Verification...');
-  await page.goto('http://localhost:5173/login', { waitUntil: 'networkidle' });
-
-  console.log('8. Clicking Facebook Demo...');
-  const fbDemoBtn = page.getByRole('button', { name: 'Facebook Demo', exact: true });
-  await fbDemoBtn.click();
+  // Test 3: Sandbox/Evaluation Token Exchange & Session Creation
+  console.log('7. Testing Passport OAuth Callback Token Exchange via /auth/facebook?demo=true...');
+  await page.goto('http://localhost:5000/api/v1/auth/facebook?demo=true', { waitUntil: 'networkidle' });
 
   await page.waitForURL('http://localhost:5173/', { timeout: 10000 });
   const navText = await page.locator('nav').textContent();
-  console.log('9. Session established via /oauth-callback. Navbar:', navText.replace(/\s+/g, ' '));
+  console.log('8. Session established via OAuth Callback. Navbar:', navText.replace(/\s+/g, ' '));
 
   await browser.close();
   console.log('--- ALL OAUTH 2.0 TESTS COMPLETED AND VERIFIED ---');
