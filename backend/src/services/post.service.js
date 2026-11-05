@@ -254,6 +254,26 @@ export class PostService {
       details: { title: post.title, deletedAt: post.deletedAt }
     });
 
+    // Real-time notification: alert author if admin moderated their post
+    try {
+      const io = getSocketIO();
+      if (io) {
+        if (currentUser.role === 'admin' && post.author.toString() !== currentUser._id.toString()) {
+          io.to(`user_${post.author.toString()}`).emit('notification', {
+            type: 'POST_MODERATED',
+            title: 'Post Moderated',
+            message: `An Administrator has soft-deleted your post "${post.title}"`,
+            postId: post._id,
+            slug: post.slug,
+            createdAt: new Date().toISOString()
+          });
+        }
+        io.emit('post_deleted', { postId: post._id });
+      }
+    } catch {
+      // Socket optional
+    }
+
     return { message: 'Post soft deleted successfully', id: post._id };
   }
 
@@ -285,6 +305,26 @@ export class PostService {
       entityId: post._id,
       details: { title: post.title }
     });
+
+    // Real-time notification: alert author if admin restored their post
+    try {
+      const io = getSocketIO();
+      if (io) {
+        if (currentUser.role === 'admin' && post.author.toString() !== currentUser._id.toString()) {
+          io.to(`user_${post.author.toString()}`).emit('notification', {
+            type: 'POST_RESTORED',
+            title: 'Post Restored',
+            message: `An Administrator has restored your post "${post.title}"`,
+            postId: post._id,
+            slug: post.slug,
+            createdAt: new Date().toISOString()
+          });
+        }
+        io.emit('post_restored', { postId: post._id });
+      }
+    } catch {
+      // Socket optional
+    }
 
     return { message: 'Post restored successfully', post };
   }

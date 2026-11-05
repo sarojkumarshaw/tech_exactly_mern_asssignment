@@ -303,19 +303,35 @@ export const Notifications = () => {
             <div className="pt-3 border-t border-slate-100 space-y-2">
               <button
                 type="button"
-                onClick={() => sendTestNotification('🚀 New comment posted on your article!')}
+                onClick={() => sendTestNotification('🚀 Jane Doe commented on your post "Getting Started with MERN"!')}
                 className="w-full text-left px-3 py-2 bg-slate-50 hover:bg-slate-100 rounded-xl text-xs text-slate-700 font-semibold transition-colors flex items-center justify-between"
               >
-                <span>Simulate Comment Event</span>
+                <span>Scenario 1: Comment On Post</span>
                 <MessageSquare className="w-3.5 h-3.5 text-emerald-500" />
               </button>
               <button
                 type="button"
-                onClick={() => sendTestNotification('📢 Tech Exactly Assignment evaluation alert')}
+                onClick={() => sendTestNotification('✍️ New article published: "Architecting Scalable Microservices with Node.js"')}
                 className="w-full text-left px-3 py-2 bg-slate-50 hover:bg-slate-100 rounded-xl text-xs text-slate-700 font-semibold transition-colors flex items-center justify-between"
               >
-                <span>Simulate Assignment Broadcast</span>
+                <span>Scenario 2: New Article Published</span>
+                <FileText className="w-3.5 h-3.5 text-blue-500" />
+              </button>
+              <button
+                type="button"
+                onClick={() => sendTestNotification('📢 Tech Exactly Assignment evaluation live broadcast alert')}
+                className="w-full text-left px-3 py-2 bg-slate-50 hover:bg-slate-100 rounded-xl text-xs text-slate-700 font-semibold transition-colors flex items-center justify-between"
+              >
+                <span>Scenario 3: System Broadcast</span>
                 <Megaphone className="w-3.5 h-3.5 text-amber-500" />
+              </button>
+              <button
+                type="button"
+                onClick={() => sendTestNotification('🛡️ Administrator moderated post: "Clean Architecture in React"')}
+                className="w-full text-left px-3 py-2 bg-slate-50 hover:bg-slate-100 rounded-xl text-xs text-slate-700 font-semibold transition-colors flex items-center justify-between"
+              >
+                <span>Scenario 4: Post Moderated</span>
+                <Shield className="w-3.5 h-3.5 text-rose-500" />
               </button>
             </div>
           </div>

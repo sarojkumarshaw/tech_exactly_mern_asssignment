@@ -33,15 +33,46 @@ export const NotificationProvider = ({ children }) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
+  // Gentle audio chime for push alerts (zero external audio files, native Web Audio API)
+  const playNotificationSound = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) {
+          const ctx = new AudioCtx();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5 note
+          osc.frequency.setValueAtTime(880, ctx.currentTime + 0.08); // A5 note
+          gain.gain.setValueAtTime(0.12, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.3);
+        }
+      } catch {
+        // Audio optional / browser gesture blocked
+      }
+    }
+  }, []);
+
   // Browser HTML5 Desktop Notification trigger
-  const triggerBrowserPush = useCallback((title, body) => {
+  const triggerBrowserPush = useCallback((title, body, targetUrl = '/notifications') => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
       if (Notification.permission === 'granted') {
         try {
-          new Notification(title, {
+          const notification = new Notification(title, {
             body,
             icon: '/favicon.ico'
           });
+          notification.onclick = () => {
+            window.focus();
+            if (targetUrl && typeof window !== 'undefined') {
+              window.location.href = targetUrl;
+            }
+          };
         } catch {
           // Fallback if browser blocks constructor
         }
@@ -122,19 +153,22 @@ export const NotificationProvider = ({ children }) => {
       showToast(`⚡ WebSocket Ping: ${rtt}ms latency`, 'success', 2500);
     });
 
-    // Targeted notification event (e.g. comment on user's post)
+    // Targeted notification event (e.g. comment on user's post, admin moderation)
     newSocket.on('notification', (data) => {
       logEvent('RECEIVED', 'notification', data);
       setNotifications((prev) => [{ ...data, id: Date.now(), read: false }, ...prev]);
       showToast(data.message, 'info');
-      triggerBrowserPush('Tech Exactly - New Notification', data.message);
+      playNotificationSound();
+      const targetUrl = data.slug ? `/posts/${data.slug}` : '/notifications';
+      triggerBrowserPush(data.title || 'Tech Exactly - New Notification', data.message, targetUrl);
     });
 
     // Public post broadcast
     newSocket.on('new_post', (post) => {
       logEvent('RECEIVED', 'new_post', post);
       showToast(`New article published: "${post.title}"`, 'success');
-      triggerBrowserPush('Tech Exactly - New Article Published', post.title);
+      playNotificationSound();
+      triggerBrowserPush('Tech Exactly - New Article Published', post.title, `/posts/${post.slug}`);
     });
 
     // Global admin announcement broadcast
@@ -142,7 +176,17 @@ export const NotificationProvider = ({ children }) => {
       logEvent('RECEIVED', 'broadcast_announcement', announcementData);
       setAnnouncement(announcementData);
       showToast(`📢 Announcement: ${announcementData.title}`, 'warning', 6000);
-      triggerBrowserPush(`📢 ${announcementData.title}`, announcementData.message);
+      playNotificationSound();
+      triggerBrowserPush(`📢 ${announcementData.title}`, announcementData.message, '/notifications');
+    });
+
+    // Real-time post deletion/restoration updates
+    newSocket.on('post_deleted', (data) => {
+      logEvent('RECEIVED', 'post_deleted', data);
+    });
+
+    newSocket.on('post_restored', (data) => {
+      logEvent('RECEIVED', 'post_restored', data);
     });
 
     // Activity log event for admin room
@@ -153,7 +197,7 @@ export const NotificationProvider = ({ children }) => {
     return () => {
       newSocket.disconnect();
     };
-  }, [user?._id, logEvent, showToast, triggerBrowserPush]);
+  }, [user?._id, logEvent, showToast, triggerBrowserPush, playNotificationSound]);
 
   // Interactive Trigger Methods
   const sendPing = () => {
