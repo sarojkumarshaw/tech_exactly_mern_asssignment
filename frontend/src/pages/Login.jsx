@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
-import { Mail, Lock, Eye, EyeOff, LogIn, Shield, User, ArrowRight } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Shield, User, ArrowRight } from 'lucide-react';
 import { TechExactlyLogo } from '../components/TechExactlyLogo';
 
 export const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, socialLogin } = useAuth();
+  const { login } = useAuth();
   const { showToast } = useNotification();
 
   const [email, setEmail] = useState('');
@@ -36,44 +36,19 @@ export const Login = () => {
     }
   };
 
-  const [showOAuthInfo, setShowOAuthInfo] = useState(false);
-
   const fillCredentials = (demoEmail, demoPassword) => {
     setEmail(demoEmail);
     setPassword(demoPassword);
     setErrorMsg('');
   };
 
-  const handlePassportOAuth = (provider, demo = false) => {
+  const handlePassportOAuth = (provider) => {
     setSubmitting(true);
-    // Standard OAuth 2.0 Authorization Flow via Passport.js
-    const backendUrl = 'http://localhost:5000';
-    const query = demo ? '?demo=true' : '';
-    window.location.href = `${backendUrl}/api/v1/auth/${provider}${query}`;
+    const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
+    const baseUrl = backendUrl.replace(/\/api\/v1$/, '');
+    window.location.href = `${baseUrl}/api/v1/auth/${provider}`;
   };
 
-  const handleSimulatedSocial = async (provider) => {
-    setSubmitting(true);
-    try {
-      // Simulated OAuth token exchange
-      const dummyToken = `oauth_${provider}_${Math.random().toString(36).substring(7)}`;
-      const dummyEmail = `${provider}.demo@example.com`;
-      const dummyName = `${provider.charAt(0).toUpperCase() + provider.slice(1)} Explorer`;
-
-      await socialLogin(provider, dummyToken, {
-        email: dummyEmail,
-        name: dummyName,
-        avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${dummyEmail}`
-      });
-
-      showToast(`Signed in with ${provider}!`, 'success');
-      navigate(redirectPath, { replace: true });
-    } catch (err) {
-      showToast(err.response?.data?.error?.message || 'Social sign-in failed', 'error');
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
@@ -217,9 +192,9 @@ export const Login = () => {
 
             <button
               type="button"
-              onClick={() => handlePassportOAuth('facebook', false)}
+              onClick={() => handlePassportOAuth('facebook')}
               className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 rounded-xl text-xs font-bold text-slate-700 shadow-sm transition-all"
-              title="Redirects to facebook.com/dialog/oauth via Passport.js"
+              title="Sign in with Facebook via OAuth 2.0"
             >
               <svg className="w-4 h-4" fill="#1877F2" viewBox="0 0 24 24">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
@@ -227,54 +202,6 @@ export const Login = () => {
               Facebook
             </button>
           </div>
-
-          {/* Sandbox Demo option for offline testing */}
-          {/* <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
-            <span className="text-slate-400 font-medium">Evaluation Demo Mode:</span>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => handlePassportOAuth('google', true)}
-                className="text-indigo-600 hover:text-indigo-700 font-bold hover:underline"
-                title="Test simulated token exchange locally"
-              >
-                Google Demo
-              </button>
-              <span className="text-slate-300">|</span>
-              <button
-                type="button"
-                onClick={() => handlePassportOAuth('facebook', true)}
-                className="text-blue-600 hover:text-blue-700 font-bold hover:underline"
-                title="Test simulated token exchange locally"
-              >
-                Facebook Demo
-              </button>
-            </div>
-          </div> */}
-
-          {/* Explanatory Toggle */}
-          {/* <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 text-[11px] text-slate-500">
-            <button
-              type="button"
-              onClick={() => setShowOAuthInfo(!showOAuthInfo)}
-              className="w-full flex items-center justify-between font-bold text-slate-600 hover:text-slate-900"
-            >
-              <span>ℹ️ Why does Facebook ask for an App ID?</span>
-              <span>{showOAuthInfo ? '▲' : '▼'}</span>
-            </button>
-            {showOAuthInfo && (
-              <p className="mt-2 text-slate-500 leading-relaxed">
-                Clicking the main <strong>Facebook</strong> or <strong>Google</strong> button directly triggers the live OAuth 2.0 flow via Passport.js, redirecting to Facebook/Google. If you have not yet registered a free app on <strong>developers.facebook.com</strong>, Meta will show an "Invalid App ID" notice. Use <strong>Demo Mode</strong> to test the JWT token exchange locally without Meta developer credentials.
-              </p>
-            )}
-          </div> */}
-
-          {/* <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-400">
-            <span>Powered by</span>
-            <span className="font-semibold text-slate-600">Passport.js</span>
-            <span>&amp;</span>
-            <span className="font-semibold text-slate-600">Google Auth Library</span>
-          </div> */}
         </div>
 
         <p className="text-center text-xs text-slate-500">

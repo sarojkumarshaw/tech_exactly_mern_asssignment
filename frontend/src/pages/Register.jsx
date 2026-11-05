@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
-import { User, Mail, Lock, Eye, EyeOff, UserPlus, ArrowRight } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { TechExactlyLogo } from '../components/TechExactlyLogo';
 
 export const Register = () => {
@@ -29,7 +29,7 @@ export const Register = () => {
     setSubmitting(true);
     try {
       await register(name.trim(), email.trim(), password);
-      showToast('Registration successful! Welcome to DevSphere.', 'success');
+      showToast('Registration successful! Welcome to Tech Exactly Portal.', 'success');
       navigate('/');
     } catch (err) {
       const msg = err.response?.data?.error?.message || 'Registration failed. Please try again.';

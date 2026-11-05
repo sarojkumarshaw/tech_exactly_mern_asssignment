@@ -10,7 +10,6 @@ import {
   Edit,
   Trash2,
   RefreshCw,
-  Clock,
   CheckCircle2,
   AlertCircle
 } from 'lucide-react';

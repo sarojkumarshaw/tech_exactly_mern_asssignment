@@ -10,14 +10,9 @@ import {
   Bell,
   Menu,
   X,
-  User as UserIcon,
-  Radio,
-  Zap,
-  ExternalLink,
-  CheckCircle2
+  User as UserIcon
 } from 'lucide-react';
 import { TechExactlyLogo } from './TechExactlyLogo';
-import { SocketStudioModal } from './SocketStudioModal';
 
 export const Navbar = () => {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
@@ -26,7 +21,6 @@ export const Navbar = () => {
 
   const [showNotifications, setShowNotifications] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isStudioOpen, setIsStudioOpen] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -97,16 +91,6 @@ export const Navbar = () => {
 
           {/* Right Action Icons / Auth Controls */}
           <div className="hidden md:flex items-center gap-3">
-            {/* Live Socket.io Testing Studio Trigger Button */}
-            {/* <button
-              onClick={() => setIsStudioOpen(true)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/80 rounded-xl text-xs font-bold transition-all shadow-sm group"
-              title="Open Live Socket.io Testing Studio"
-            >
-              <Radio className="w-3.5 h-3.5 text-emerald-600 animate-pulse group-hover:scale-110" />
-              <span>Socket.io Live</span>
-            </button> */}
-
             {isAuthenticated ? (
               <>
                 {/* Real-time Notifications Bell */}
@@ -350,12 +334,6 @@ export const Navbar = () => {
           )}
         </div>
       )}
-
-      {/* Live Socket.io Testing Modal */}
-      <SocketStudioModal
-        isOpen={isStudioOpen}
-        onClose={() => setIsStudioOpen(false)}
-      />
     </nav>
   );
 };

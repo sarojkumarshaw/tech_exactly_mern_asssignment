@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useNotification } from '../context/NotificationContext';
-import { PenTool, Image, Eye, EyeOff, Sparkles, ArrowLeft } from 'lucide-react';
+import { PenTool, Image, Eye, EyeOff, Sparkles } from 'lucide-react';
 
 const CATEGORIES = ['Engineering', 'Database', 'WebSockets', 'Architecture', 'Design', 'General'];
 

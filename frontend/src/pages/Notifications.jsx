@@ -14,8 +14,7 @@ import {
   Clock,
   ArrowRight,
   Shield,
-  Send,
-  ExternalLink
+  Send
 } from 'lucide-react';
 
 export const Notifications = () => {
