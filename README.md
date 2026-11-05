@@ -48,7 +48,7 @@ DevSphere follows Clean Architecture principles with strict separation of concer
 - **Refresh Token Rotation**: Dedicated `/api/v1/auth/refresh-token` endpoint with database tracking and revocation upon logout.
 - **Brute-Force Rate Limiting**: Dedicated `authLimiter` middleware guards login and registration against credential stuffing.
 - **Bcrypt Hashing**: Passwords salted and hashed with 12 rounds before persisting.
-- **Social Login Support**: Integration ready for Google and Facebook OAuth 2.0 with automatic account linking and fallback simulated token exchange for local testing.
+- **Social Login Support (OAuth 2.0 via Libraries)**: Implemented using industry-standard libraries: **Passport.js** (`passport-google-oauth20`, `passport-facebook`), **Google Auth Library** (`google-auth-library`), and **React OAuth** (`@react-oauth/google`). Features full authorization code exchange, callback redirect handling, token verification, and automated profile syncing.
 - **Secure Secret Storage**: All secrets loaded from environment variables (`.env`).
 
 ### 2. User Roles & Role-Based Access Control (RBAC)

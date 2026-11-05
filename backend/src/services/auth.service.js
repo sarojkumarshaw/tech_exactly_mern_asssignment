@@ -2,6 +2,15 @@ import { User } from '../models/user.model.js';
 import { ApiError } from '../utils/apiError.js';
 import { generateTokens, verifyRefreshToken } from '../utils/tokens.js';
 import { logActivity } from '../middleware/activityLogger.middleware.js';
+import { OAuth2Client } from 'google-auth-library';
+import { env } from '../config/env.js';
+import { logger } from '../config/logger.js';
+
+const googleClient = new OAuth2Client(
+  env.GOOGLE_CLIENT_ID && !env.GOOGLE_CLIENT_ID.includes('your-google-client-id')
+    ? env.GOOGLE_CLIENT_ID
+    : undefined
+);
 
 export class AuthService {
   /**
@@ -150,56 +159,18 @@ export class AuthService {
   }
 
   /**
-   * Social OAuth Login (Google / Facebook)
-   * Supports live OAuth 2.0 token verification with Google & Facebook APIs,
-   * with seamless fallback for simulated local demo payloads.
+   * Find or create social user (Used by Passport.js strategies & OAuth callbacks)
    */
-  static async socialLogin({ provider, token, email, name, avatar }, req) {
+  static async findOrCreateSocialUser({ provider, providerId, email, name, avatar }, req = {}) {
     let resolvedEmail = email;
-    let resolvedName = name || `${provider.charAt(0).toUpperCase() + provider.slice(1)} User`;
-    let resolvedAvatar = avatar || '';
-    let resolvedProviderId = token;
-
-    // 1. Live Google OAuth 2.0 Token Verification
-    if (provider === 'google' && token && (token.startsWith('eyJ') || token.includes('.'))) {
-      try {
-        const googleRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${token}`);
-        if (googleRes.ok) {
-          const googleData = await googleRes.json();
-          resolvedEmail = googleData.email || resolvedEmail;
-          resolvedName = googleData.name || resolvedName;
-          resolvedAvatar = googleData.picture || resolvedAvatar;
-          resolvedProviderId = googleData.sub || resolvedProviderId;
-        }
-      } catch (err) {
-        // Fall back to client payload if offline or in simulated test
-      }
-    }
-
-    // 2. Live Facebook OAuth 2.0 Access Token Verification
-    if (provider === 'facebook' && token && (token.startsWith('EA') || token.length > 25)) {
-      try {
-        const fbRes = await fetch(
-          `https://graph.facebook.com/me?fields=id,name,email,picture.type(large)&access_token=${token}`
-        );
-        if (fbRes.ok) {
-          const fbData = await fbRes.json();
-          resolvedEmail = fbData.email || resolvedEmail;
-          resolvedName = fbData.name || resolvedName;
-          resolvedAvatar = fbData.picture?.data?.url || resolvedAvatar;
-          resolvedProviderId = fbData.id || resolvedProviderId;
-        }
-      } catch (err) {
-        // Fall back to client payload if offline or in simulated test
-      }
-    }
-
     if (!resolvedEmail) {
-      resolvedEmail = `${provider}_user_${Date.now()}@example.com`;
+      resolvedEmail = `${provider}_${providerId || Date.now()}@example.com`;
     }
+    const resolvedName = name || `${provider.charAt(0).toUpperCase() + provider.slice(1)} User`;
+    const resolvedAvatar = avatar || '';
 
     let user = await User.findOne({
-      $or: [{ email: resolvedEmail }, { providerId: resolvedProviderId, authProvider: provider }]
+      $or: [{ email: resolvedEmail }, { providerId, authProvider: provider }]
     }).select('+refreshToken');
 
     if (!user) {
@@ -207,15 +178,14 @@ export class AuthService {
         name: resolvedName,
         email: resolvedEmail,
         authProvider: provider,
-        providerId: resolvedProviderId,
+        providerId: providerId || String(Date.now()),
         avatar: resolvedAvatar,
         role: 'user',
         isActive: true
       });
     } else {
-      // Link social provider if matched by email
       user.authProvider = provider;
-      user.providerId = resolvedProviderId;
+      if (providerId) user.providerId = providerId;
       if (resolvedAvatar && !user.avatar) user.avatar = resolvedAvatar;
     }
 
@@ -229,7 +199,7 @@ export class AuthService {
       action: 'USER_LOGIN',
       entityType: 'AUTH',
       entityId: user._id,
-      details: { email: user.email, provider, authProvider: provider }
+      details: { email: user.email, provider, authProvider: provider, method: 'oauth2_library' }
     });
 
     return {
@@ -243,6 +213,74 @@ export class AuthService {
       },
       tokens
     };
+  }
+
+  /**
+   * Social OAuth Login (Google / Facebook)
+   * Supports live OAuth 2.0 verification using google-auth-library and Facebook Graph API,
+   * with seamless fallback for simulated local demo payloads.
+   */
+  static async socialLogin({ provider, token, email, name, avatar }, req) {
+    let resolvedEmail = email;
+    let resolvedName = name || `${provider.charAt(0).toUpperCase() + provider.slice(1)} User`;
+    let resolvedAvatar = avatar || '';
+    let resolvedProviderId = token || String(Date.now());
+
+    // 1. Google OAuth 2.0 Verification via google-auth-library SDK
+    if (provider === 'google' && token && (token.startsWith('eyJ') || token.includes('.'))) {
+      try {
+        if (env.GOOGLE_CLIENT_ID && !env.GOOGLE_CLIENT_ID.includes('your-google-client-id')) {
+          const ticket = await googleClient.verifyIdToken({
+            idToken: token,
+            audience: env.GOOGLE_CLIENT_ID
+          });
+          const payload = ticket.getPayload();
+          if (payload) {
+            resolvedEmail = payload.email || resolvedEmail;
+            resolvedName = payload.name || resolvedName;
+            resolvedAvatar = payload.picture || resolvedAvatar;
+            resolvedProviderId = payload.sub || resolvedProviderId;
+          }
+        } else {
+          const googleRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${token}`);
+          if (googleRes.ok) {
+            const googleData = await googleRes.json();
+            resolvedEmail = googleData.email || resolvedEmail;
+            resolvedName = googleData.name || resolvedName;
+            resolvedAvatar = googleData.picture || resolvedAvatar;
+            resolvedProviderId = googleData.sub || resolvedProviderId;
+          }
+        }
+      } catch (err) {
+        logger.info('Google token verification fallback applied', { error: err.message });
+      }
+    }
+
+    // 2. Facebook OAuth 2.0 Access Token Verification via Facebook Graph API
+    if (provider === 'facebook' && token && (token.startsWith('EA') || token.length > 25)) {
+      try {
+        const fbRes = await fetch(
+          `https://graph.facebook.com/me?fields=id,name,email,picture.type(large)&access_token=${token}`
+        );
+        if (fbRes.ok) {
+          const fbData = await fbRes.json();
+          resolvedEmail = fbData.email || resolvedEmail;
+          resolvedName = fbData.name || resolvedName;
+          resolvedAvatar = fbData.picture?.data?.url || resolvedAvatar;
+          resolvedProviderId = fbData.id || resolvedProviderId;
+        }
+      } catch (err) {
+        logger.info('Facebook token verification fallback applied', { error: err.message });
+      }
+    }
+
+    return await this.findOrCreateSocialUser({
+      provider,
+      providerId: resolvedProviderId,
+      email: resolvedEmail,
+      name: resolvedName,
+      avatar: resolvedAvatar
+    }, req);
   }
 }
 

@@ -8,6 +8,7 @@ import { morganStream } from './config/logger.js';
 import { requestIdMiddleware } from './middleware/requestId.middleware.js';
 import { globalLimiter } from './middleware/rateLimiter.middleware.js';
 import { notFoundHandler, errorHandler } from './middleware/error.middleware.js';
+import passport from './config/passport.js';
 import v1Router from './routes/index.js';
 
 const app = express();
@@ -55,6 +56,7 @@ app.use(requestIdMiddleware);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
+app.use(passport.initialize());
 
 // HTTP request logging
 if (env.NODE_ENV !== 'test') {

@@ -68,8 +68,8 @@ npm.cmd install concurrently --save-dev
 ```powershell
 cd backend
 
-# Production dependencies
-npm.cmd install express mongoose dotenv cors helmet express-rate-limit bcryptjs jsonwebtoken zod winston winston-daily-rotate-file morgan uuid socket.io slugify sanitize-html cookie-parser nodemailer
+# Production dependencies (including Passport.js and OAuth 2.0 SDKs)
+npm.cmd install express mongoose dotenv cors helmet express-rate-limit bcryptjs jsonwebtoken zod winston winston-daily-rotate-file morgan uuid socket.io slugify sanitize-html cookie-parser nodemailer passport passport-google-oauth20 passport-facebook google-auth-library
 
 # Development & Testing dependencies
 npm.cmd install nodemon jest supertest cross-env --save-dev
@@ -77,12 +77,12 @@ npm.cmd install nodemon jest supertest cross-env --save-dev
 cd ..
 ```
 
-### C. Frontend Dependencies (Vite + React + Tailwind)
+### C. Frontend Dependencies (Vite + React + Tailwind + React OAuth)
 ```powershell
 cd frontend
 
 # Production dependencies
-npm.cmd install react react-dom react-router-dom axios lucide-react socket.io-client
+npm.cmd install react react-dom react-router-dom axios lucide-react socket.io-client @react-oauth/google
 
 # Development & Styling dependencies
 npm.cmd install -D vite @vitejs/plugin-react tailwindcss postcss autoprefixer
@@ -128,9 +128,13 @@ LOG_LEVEL=info
 LOG_TO_FILE=true
 LOG_TO_DB=true
 
-# OAuth (Optional Google / Facebook client credentials)
+# OAuth 2.0 Credentials (Passport.js & Google Auth Library)
 GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_CALLBACK_URL=http://localhost:5000/api/v1/auth/google/callback
 FACEBOOK_APP_ID=your-facebook-app-id
+FACEBOOK_APP_SECRET=your-facebook-app-secret
+FACEBOOK_CALLBACK_URL=http://localhost:5000/api/v1/auth/facebook/callback
 ```
 
 ---
@@ -208,4 +212,23 @@ npm.cmd run build
 cd ../backend
 $env:NODE_ENV="production"; node src/server.js
 ```
+
+---
+
+## 9. Verifying OAuth 2.0 Social Media Login
+
+To test the complete automated OAuth 2.0 library flow in headless Chrome:
+
+```powershell
+# In project root:
+node scripts/test_oauth_flow.js
+```
+
+This automated suite tests:
+1. Google OAuth 2.0 initiation via `/api/v1/auth/google`.
+2. Token exchange and callback redirection to `/oauth-callback`.
+3. React session initialization and navbar profile synchronization.
+4. Clean user logout.
+5. Facebook OAuth 2.0 initiation via `/api/v1/auth/facebook`.
+6. Profile verification and session termination.
 

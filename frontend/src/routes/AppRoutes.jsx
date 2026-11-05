@@ -9,6 +9,7 @@ import { Login } from '../pages/Login';
 import { Register } from '../pages/Register';
 import { AdminDashboard } from '../pages/AdminDashboard';
 import { NotFound } from '../pages/NotFound';
+import OAuthCallback from '../pages/OAuthCallback';
 import { ProtectedRoute } from '../components/ProtectedRoute';
 import { AdminRoute } from '../components/AdminRoute';
 
@@ -20,6 +21,7 @@ export const AppRoutes = () => {
       <Route path="/posts/:slug" element={<PostDetails />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/oauth-callback" element={<OAuthCallback />} />
 
       {/* Authenticated User Pages */}
       <Route

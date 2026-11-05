@@ -65,6 +65,18 @@ export const AuthProvider = ({ children }) => {
     return userData;
   };
 
+  const handleOAuthCallback = async (accessToken, refreshToken) => {
+    localStorage.setItem('accessToken', accessToken);
+    if (refreshToken) {
+      localStorage.setItem('refreshToken', refreshToken);
+    }
+    const res = await api.get('/auth/me');
+    const userData = res.data.data.user;
+    setUser(userData);
+    localStorage.setItem('user', JSON.stringify(userData));
+    return userData;
+  };
+
   const logout = async () => {
     try {
       await api.post('/auth/logout');
@@ -94,6 +106,7 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     socialLogin,
+    handleOAuthCallback,
     logout,
     updateProfile
   };

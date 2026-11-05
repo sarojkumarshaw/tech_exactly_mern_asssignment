@@ -23,7 +23,11 @@ export const env = {
   LOG_TO_FILE: process.env.LOG_TO_FILE === 'true',
   LOG_TO_DB: process.env.LOG_TO_DB !== 'false',
   SERVICE_NAME: 'mern-blog-api',
-  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || 'dummy-google-client-id',
-  FACEBOOK_APP_ID: process.env.FACEBOOK_APP_ID || 'dummy-facebook-app-id'
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || 'your-google-client-id.apps.googleusercontent.com',
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '',
+  GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/v1/auth/google/callback',
+  FACEBOOK_APP_ID: process.env.FACEBOOK_APP_ID || 'your-facebook-app-id',
+  FACEBOOK_APP_SECRET: process.env.FACEBOOK_APP_SECRET || '',
+  FACEBOOK_CALLBACK_URL: process.env.FACEBOOK_CALLBACK_URL || 'http://localhost:5000/api/v1/auth/facebook/callback'
 };
 
