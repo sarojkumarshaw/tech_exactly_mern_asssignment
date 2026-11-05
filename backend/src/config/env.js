@@ -7,9 +7,21 @@ const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
+const defaultServerUrl = `http://localhost:${process.env.PORT || '5000'}`;
+const serverUrl = process.env.SERVER_URL || defaultServerUrl;
+
+if (process.env.NODE_ENV === 'production') {
+  if (!process.env.JWT_ACCESS_SECRET || !process.env.JWT_REFRESH_SECRET) {
+    throw new Error(
+      'SECURITY CONFIGURATION ERROR: JWT_ACCESS_SECRET and JWT_REFRESH_SECRET must be explicitly set via environment variables in production.'
+    );
+  }
+}
+
 export const env = {
   NODE_ENV: process.env.NODE_ENV || 'development',
   PORT: parseInt(process.env.PORT || '5000', 10),
+  SERVER_URL: serverUrl,
   CLIENT_URL: process.env.CLIENT_URL || 'http://localhost:5173',
   MONGODB_URI: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/mern_blog_db',
   JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET || 'access_secret_super_secure_key_123456789!',
@@ -25,9 +37,9 @@ export const env = {
   SERVICE_NAME: 'mern-blog-api',
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || 'your-google-client-id.apps.googleusercontent.com',
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '',
-  GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/v1/auth/google/callback',
+  GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL || `${serverUrl}/api/v1/auth/google/callback`,
   FACEBOOK_APP_ID: process.env.FACEBOOK_APP_ID || 'your-facebook-app-id',
   FACEBOOK_APP_SECRET: process.env.FACEBOOK_APP_SECRET || '',
-  FACEBOOK_CALLBACK_URL: process.env.FACEBOOK_CALLBACK_URL || 'http://localhost:5000/api/v1/auth/facebook/callback'
+  FACEBOOK_CALLBACK_URL: process.env.FACEBOOK_CALLBACK_URL || `${serverUrl}/api/v1/auth/facebook/callback`
 };
 

@@ -44,8 +44,8 @@ export const Login = () => {
 
   const handlePassportOAuth = (provider) => {
     setSubmitting(true);
-    const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
-    const baseUrl = backendUrl.replace(/\/api\/v1$/, '');
+    const backendUrl = import.meta.env.VITE_API_URL || '';
+    const baseUrl = backendUrl ? backendUrl.replace(/\/api\/v1$/, '') : '';
     window.location.href = `${baseUrl}/api/v1/auth/${provider}`;
   };
 
