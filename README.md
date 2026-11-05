@@ -276,6 +276,8 @@ An automated high-definition walkthrough demonstrating all core features, brandi
 
 - **Recorded Video File**: [`demo_video/tech_exactly_mern_assignment_walkthrough.webm`](file:///d:/nodereact/mern_assignment/demo_video/tech_exactly_mern_assignment_walkthrough.webm)
 - **Alternate Mirror**: [`demo_video/devsphere_mern_demo_walkthrough.webm`](file:///d:/nodereact/mern_assignment/demo_video/devsphere_mern_demo_walkthrough.webm)
-- **Step-by-Step Script**: [`DEMO_SCRIPT.md`](file:///d:/nodereact/mern_assignment/DEMO_SCRIPT.md) (10 scenes with on-screen HUD descriptions)
+- **Video Duration**: **~6.2 minutes (380 seconds)** — Fully compliant with the **5–10 minute demo video** assignment deliverable requirement.
+- **Video Resolution**: 1280x720 (HD 720p, 60fps)
+- **Step-by-Step Script**: [`DEMO_SCRIPT.md`](file:///d:/nodereact/mern_assignment/DEMO_SCRIPT.md) (12 scenes with on-screen HUD descriptions)
 
 
