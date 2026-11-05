@@ -3,6 +3,7 @@
 [![Stack](https://img.shields.io/badge/MERN-MongoDB%20%7C%20Express%20%7C%20React%20%7C%20Node-indigo)](https://react.dev)
 [![Tests](https://img.shields.io/badge/Automated%20Tests-44%20Passed-emerald)](https://vitest.dev)
 [![Architecture](https://img.shields.io/badge/Architecture-Service--Oriented%204--Tier-blue)](https://expressjs.com)
+[![Specification](https://img.shields.io/badge/Specification-Assignment%20PDF-orange)](MERN%20Stack%20Assignment.pdf)
 [![Video](https://img.shields.io/badge/Walkthrough-5.06%20Minutes-red)](demo_video/tech_exactly_mern_assignment_walkthrough.webm)
 
 A production-grade, event-driven full-stack blog platform built for the **Tech Exactly MERN Stack Assignment** using **MongoDB, Express.js, React.js, and Node.js**. It features enterprise-grade Role-Based Access Control (RBAC), JWT authentication with access and refresh token rotation, soft deletion with administrator restoration, centralized error handling, Winston structured logging, Zod validation, compound indexing, and real-time Socket.io notifications.
