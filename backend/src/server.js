@@ -14,9 +14,9 @@ const startServer = async () => {
     // Initialize Socket.io
     initSocket(server, env.CLIENT_URL);
 
-    server.listen(env.PORT, () => {
+    server.listen(env.PORT, '0.0.0.0', () => {
       logger.info(`Server running in ${env.NODE_ENV} mode on port ${env.PORT}`);
-      logger.info(`API Health check available at: http://localhost:${env.PORT}/api/v1/health`);
+      logger.info(`API Health check available at: http://127.0.0.1:${env.PORT}/api/v1/health`);
     });
 
     // Graceful shutdown handling
