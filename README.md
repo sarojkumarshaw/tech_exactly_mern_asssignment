@@ -1,359 +1,212 @@
 # Tech Exactly - MERN Stack Assignment Platform
 
-[![Build Status](https://img.shields.io/badge/Build-Passing-emerald)](https://github.com)
-[![Tests Coverage](https://img.shields.io/badge/Jest%20Tests-15%20Passed-blue)](https://jestjs.io)
 [![Stack](https://img.shields.io/badge/MERN-MongoDB%20%7C%20Express%20%7C%20React%20%7C%20Node-indigo)](https://react.dev)
-[![Architecture](https://img.shields.io/badge/Architecture-Clean%20%26%20Modular-violet)](https://expressjs.com)
+[![Tests](https://img.shields.io/badge/Automated%20Tests-44%20Passed-emerald)](https://vitest.dev)
+[![Architecture](https://img.shields.io/badge/Architecture-Service--Oriented%204--Tier-blue)](https://expressjs.com)
+[![Video](https://img.shields.io/badge/Walkthrough-5.06%20Minutes-red)](demo_video/tech_exactly_mern_assignment_walkthrough.webm)
 
-**Tech Exactly Assignment Platform** is a high-performance, modular full-stack blog platform built with MongoDB, Express.js, React.js, and Node.js. It features **Role-Based Access Control (RBAC)**, **dual JWT access and refresh token authentication**, **soft deletion with admin recovery**, **database-backed activity logging & Winston error logging**, **centralized error handling**, **Zod request validation**, **MongoDB query indexing and pagination**, and **real-time Socket.io notifications & admin broadcast controls**.
-
----
-
-## Architecture Overview
-
-The system follows Clean Architecture principles with strict separation of concerns:
-
-```
-[ React 18 Frontend + Vite + Tailwind CSS ]
-                    │
-                    ▼  (REST API + Socket.io)
-[ Security & Middleware Layer ]
-   ├── Helmet & CORS Whitelisting
-   ├── Global & Auth Rate Limiting (express-rate-limit)
-   ├── Unique Request ID Tracking (UUIDv4)
-   ├── Bearer JWT Access & Refresh Token Validation
-   ├── Role-Based Access Control (RBAC: Admin vs Regular User)
-   ├── Reusable User Activity Logger (Winston + MongoDB ActivityLog)
-   └── Centralized Error Handling & DB Error Logger
-                    │
-                    ▼
-[ Controllers Layer ]  (Express Request Parsing & ApiResponse Serialization)
-                    │
-                    ▼
-[ Service Layer ]      (Business Logic, Domain Validation, Slug Generation, Socket Broadcasts)
-                    │
-                    ▼
-[ Mongoose Models / ODM ]  (Compound Indexes, Virtuals, Pre-hooks)
-                    │
-                    ▼
-[ MongoDB Database ]
-```
+A production-grade, event-driven full-stack blog platform built for the **Tech Exactly MERN Stack Assignment** using **MongoDB, Express.js, React.js, and Node.js**. It features enterprise-grade Role-Based Access Control (RBAC), JWT authentication with access and refresh token rotation, soft deletion with administrator restoration, centralized error handling, Winston structured logging, Zod validation, compound indexing, and real-time Socket.io notifications.
 
 ---
 
-## Key Features & Assignment Compliance
+## 1. Feature Explanations
 
-### 1. User Authentication & Security
-- **JWT Dual-Token Mechanism**: Issues short-lived access tokens (15 minutes) and long-lived refresh tokens (7 days) for secure session rotation.
-- **Refresh Token Rotation**: Dedicated `/api/v1/auth/refresh-token` endpoint with database tracking and revocation upon logout.
-- **Brute-Force Rate Limiting**: Dedicated `authLimiter` middleware guards login and registration against credential stuffing.
-- **Bcrypt Hashing**: Passwords salted and hashed with 12 rounds before persisting.
-- **Social Login Support (OAuth 2.0 via Libraries)**: Implemented using industry-standard libraries: **Passport.js** (`passport-google-oauth20`, `passport-facebook`), **Google Auth Library** (`google-auth-library`), and **React OAuth** (`@react-oauth/google`). Features full authorization code exchange, callback redirect handling, token verification, and automated profile syncing.
-- **Secure Secret Storage**: All secrets loaded from environment variables (`.env`).
+### A. User Authentication & Security
+- **Dual JWT Token System**: Short-lived access tokens (15 minutes) and long-lived refresh tokens (7 days) for secure session rotation.
+- **Refresh Token Rotation & Revocation**: Dedicated `/api/v1/auth/refresh-token` endpoint rotates tokens and invalidates old ones upon logout.
+- **Axios 401 Interceptor**: Frontend automatically intercepts expired token errors, requests a fresh access token in the background, and seamlessly replays failed requests.
+- **Brute-Force Rate Limiting**: Dedicated rate-limiting middleware guards authentication endpoints against credential stuffing.
+- **Password Security**: Passwords are salted and hashed using `bcryptjs` with 12 rounds before database storage.
+- **Social Media Login (OAuth 2.0 via Libraries)**: Integrated **Passport.js** (`passport-google-oauth20`, `passport-facebook`) and `@react-oauth/google` with full token exchange, redirect handling, and profile synchronization.
+- **Environment Isolation**: All database URIs, JWT secrets, and API credentials are kept in `.env` and never committed to source control.
 
-### 2. User Roles & Role-Based Access Control (RBAC)
-- **Two User Roles**: `admin` and `user`.
-- **API-Level RBAC Enforcement**: Implemented using modular `authorizeRoles('admin')` and `checkPostOwnershipOrAdmin` middlewares.
-- **Regular Users**: Can view publications, create posts, and edit/delete **only** their own articles and comments.
-- **Administrators**:
-  - Full access to manage all users (promote/demote roles, activate/suspend accounts, delete users).
-  - Full moderation over all posts (view soft-deleted posts, restore them, or perform permanent hard deletes).
-  - Moderation over all comments.
+### B. User Roles & Role-Based Access Control (RBAC)
+- **Two Distinct Roles**: `admin` and `user`.
+- **API-Level Enforcement**: Strict middleware checks at the route and controller level ensure unprivileged users cannot escalate permissions or access restricted endpoints.
+- **Regular Users (`user`)**: Can browse published articles, create new articles, and edit or soft-delete **only their own** posts and comments.
+- **Administrators (`admin`)**:
+  - Full management of all user accounts (change roles, suspend/activate accounts, delete users).
+  - Moderation over all posts (inspect soft-deleted articles, restore them with one click, or trigger permanent hard deletion).
+  - Moderation and removal of any comment.
 
-### 3. Post Management & Soft Deletes
-- **Full CRUD**: Create, Read, Update, Delete.
-- **Automated Slug Generation**: Generates clean, URL-friendly slugs (e.g. `/posts/mastering-modern-mern-stack`) with automatic collision resolution.
-- **Soft Delete Implementation**: Uses `isDeleted: Boolean` and `deletedAt: Date`.
-  - Normal users and public queries only return active posts (`isDeleted: false`).
-  - Administrators and original authors can view their soft-deleted posts with an alert banner and restore them with one click.
-  - Permanent hard deletion is available strictly to administrators.
-- **Zod Request Validation**: Strict payload validation for titles, content, categories, and tags.
+### C. Post Management & Soft Deletion
+- **Full CRUD**: Create, read (paginated with filters), update, and delete blog posts.
+- **URL-Friendly Slugs**: Automated slug generation (`slugify`) with automatic duplicate collision handling.
+- **Soft Delete Implementation**: Articles use `isDeleted: Boolean` and `deletedAt: Date` fields. Active public feeds automatically exclude soft-deleted posts, while original authors and administrators can review soft-deleted posts with an alert banner and restore them instantly.
+- **Request Payload Validation**: Incoming requests are validated against strict **Zod** schemas for titles, HTML-sanitized content, categories, and tags.
 
-### 4. Comments & Post Associations
-- **Full CRUD for Comments**: Users can comment on any active article.
-- **Mongoose Reference Relationships**: Comments reference `Post` and `User` using MongoDB ObjectIds, populated with lean selections.
-- **Ownership Restrictions**: Regular users can edit and delete only their own comments. Administrators can delete any comment.
-- **Real-Time Comment Stream**: When a user leaves a comment, Socket.io pushes it instantaneously to everyone viewing that post.
+### D. Comments & Mongoose Relationships
+- **Post-Comment Associations**: Comments use Mongoose `Schema.Types.ObjectId` references linking directly to the parent `Post` and `User`.
+- **CRUD Operations**: Authenticated users can post comments and update or delete their own comments. Administrators can delete any comment.
+- **Real-Time Comment Stream**: New comments are pushed live to all connected readers viewing the post via Socket.io rooms.
 
-### 5. Dedicated Admin Panel (React UI)
-- Accessible only to users with the `admin` role (`<AdminRoute>`).
-- **Dashboard Metric Cards**:
-  - Total registered users.
-  - Total posts (with active vs soft-deleted breakdown).
-  - Total comments.
-  - Soft-deleted articles counter.
-- **User Management Tab**: Searchable table with instant role switching (`Make Admin` / `Make User`), status toggle (`Suspend` / `Activate`), and user deletion.
-- **Post Moderation Tab**: Filter by `All`, `Active`, or `Soft Deleted`. Features quick view, soft delete, one-click restore, and permanent hard delete.
-- **Audit Activity Log Tab**: Live stream of user actions across the entire platform.
+### E. Dedicated Admin Panel (React UI)
+- Accessible strictly to users with the `admin` role (`<AdminRoute>`).
+- **Dashboard Metrics**:
+  - Total registered users count.
+  - Total posts count (with active vs soft-deleted breakdown).
+  - Total comments count.
+  - Soft-deleted items pending moderation.
+- **Management Capabilities**: Instant role switching (`Make Admin` / `Make User`), status toggle (`Suspend` / `Activate`), soft delete inspection, and single-click post restoration.
 
-### 6. Centralized Error Handling & Logging
-- **Custom `ApiError` Class**: Standardized operational error class with status codes and machine-readable error codes (`BAD_REQUEST`, `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `CONFLICT`, etc.).
-- **Global Error Handler**: Catches all sync and async exceptions, MongoDB CastErrors (invalid ObjectIds), duplicate key errors (E11000), validation failures, and JWT expirations.
-- **Winston Daily Rotate**:
-  - `logs/error-%DATE%.log`: Rotated error logs with stack traces.
-  - `logs/combined-%DATE%.log`: Combined HTTP and server logs.
-  - `logs/activity-%DATE%.log`: Audit trail for compliance.
-- **MongoDB ErrorLog Collection**: 5xx internal server errors are automatically recorded in MongoDB with request parameters, IP, and stack frames for administrative inspection.
+### F. Middleware & Advanced Architecture
+- **Layered Decoupling**: Strict 4-tier separation: `Routes -> Controllers -> Services -> Models`. Controllers handle HTTP status codes while Services encapsulate 100% of business logic and database interactions.
+- **Activity Logging Middleware**: Logs user actions (logins, post creations, updates, deletions) to both rotated Winston log files and the MongoDB `ActivityLog` collection.
+- **Centralized Error Handling**: Standardized `ApiError` class with machine-readable error codes and global error handling middleware for synchronous and asynchronous exceptions.
+- **Performance Optimization**:
+  - Compound B-tree indexes on `{ slug: 1 }`, `{ isDeleted: 1, createdAt: -1 }`, and `{ author: 1, isDeleted: 1 }`.
+  - Pagination on posts and comments with metadata (`page`, `limit`, `totalPages`, `totalCount`).
+  - Selective field population (`.populate('author', 'name avatar')`) avoiding unnecessary database bloat.
 
-### 7. Performance Optimization
-- **Compound Database Indexing**:
-  - `{ slug: 1 }` (unique)
-  - `{ isDeleted: 1, createdAt: -1 }` (optimized post feed sorting)
-  - `{ author: 1, isDeleted: 1 }` (user post filtering)
-  - `{ post: 1, createdAt: -1 }` (fast comment retrieval)
-  - Text search index on `{ title: 'text', content: 'text' }`
-- **Pagination**: Paginated endpoints returning `docs`, `totalDocs`, `totalPages`, `currentPage`, `hasNextPage`, and `hasPrevPage`.
-- **Lean Queries**: Uses `.lean()` and targeted field projections (`.select()`) to avoid unnecessary overhead and prevent leaking sensitive password hashes.
-
-### 8. Real-Time Notifications (Socket.io)
-- **Room-Based Architecture**:
-  - `user_<userId>`: Targeted real-time alerts when someone comments on their post.
-  - `post_<postId>`: Live comment stream on open articles.
-  - `admin_room`: Instant activity stream for the admin console.
-- **Toast Notification System**: Animated bottom-right toasts for publication updates, comment notifications, and system events.
-
-### 9. Comprehensive Testing (Jest + Supertest)
-- **15 Integration Tests** verifying:
-  - User registration, login, token refresh, duplicate prevention.
-  - Post CRUD, slug generation, soft delete exclusion.
-  - Comment creation, retrieval, and editing.
-  - Role-based authorization restrictions and admin post restoration.
+### G. Bonus: Real-Time Notifications (Socket.io)
+- **Room-Based Sockets**: Dedicated rooms for individual posts (`post_<postId>`), users (`user_<userId>`), and the administrative hub (`admin_room`).
+- **Live Notifications**: Immediate notification counter updates and toast popups when users receive comments on their posts or when administrators broadcast platform announcements.
 
 ---
 
-## Directory Structure
+## 2. Environment Setup
 
-```
-mern_assignment/
-├── backend/
-│   ├── src/
-│   │   ├── config/             # DB, Winston logger, environment variables
-│   │   ├── controllers/        # Request handlers & response formatters
-│   │   ├── services/           # Core business logic & database queries
-│   │   ├── models/             # Mongoose schemas & compound indexes
-│   │   ├── routes/             # Express API routers (v1)
-│   │   ├── middleware/         # Auth, RBAC, RateLimit, ActivityLogger, ErrorHandler
-│   │   ├── validations/        # Zod request validation schemas
-│   │   ├── utils/              # ApiError, ApiResponse, Slugify, AsyncHandler
-│   │   ├── sockets/            # Socket.io connection & rooms
-│   │   ├── seeds/              # Database seeder with demo accounts & posts
-│   │   ├── app.js              # Express app setup & middleware pipeline
-│   │   └── server.js           # HTTP + Socket.io server entry point
-│   ├── tests/                  # Jest + Supertest integration test suite
-│   ├── package.json
-│   └── .env.example
-├── frontend/
-│   ├── src/
-│   │   ├── components/         # Navbar, Footer, PostCard, CommentSection, ProtectedRoute, etc.
-│   │   ├── context/            # AuthContext (JWT state), NotificationContext (Socket.io)
-│   │   ├── pages/              # Home, PostDetails, CreatePost, EditPost, MyPosts, AdminDashboard
-│   │   ├── services/           # Axios instance with 401 token refresh queue
-│   │   ├── routes/             # AppRoutes configuration
-│   │   ├── App.jsx
-│   │   └── main.jsx
-│   ├── package.json
-│   ├── vite.config.js
-│   └── tailwind.config.js
-├── package.json                # Root concurrent scripts
-├── COMMANDS.md                 # Complete setup commands reference
-└── README.md
-```
+Copy the example configuration file to create `backend/.env`:
 
----
-
-## Quickstart & Installation Guide
-
-Follow these step-by-step command line instructions to set up, install, seed, test, and run the project locally.
-
-### 1. Clone the Repository
 ```bash
-git clone <YOUR_GITHUB_REPOSITORY_URL>
-cd mern_assignment
+# Linux / macOS
+cp backend/.env.example backend/.env
+
+# Windows (PowerShell)
+Copy-Item backend/.env.example backend/.env
+
+# Windows (Command Prompt - CMD)
+copy backend\.env.example backend\.env
 ```
 
-### 2. Install Dependencies
+### Configuration Variables Reference
 
-You can install all dependencies across root, backend, and frontend with a single command:
+| Variable | Default Value | Description |
+| :--- | :--- | :--- |
+| `PORT` | `5000` | Port for the Express + Socket.io backend server |
+| `CLIENT_URL` | `http://localhost:5173` | Allowed CORS origin for the React Vite client |
+| `MONGODB_URI` | `mongodb://127.0.0.1:27017/mern_blog_db` | MongoDB connection string (local or MongoDB Atlas) |
+| `JWT_ACCESS_SECRET` | *(string)* | Secret key used to sign 15-minute JWT access tokens |
+| `JWT_REFRESH_SECRET`| *(string)* | Secret key used to sign 7-day JWT refresh tokens |
+| `JWT_ACCESS_EXPIRATION` | `15m` | Lifetime of access tokens |
+| `JWT_REFRESH_EXPIRATION`| `7d` | Lifetime of refresh tokens |
+| `RATE_LIMIT_WINDOW_MS` | `900000` (15 mins) | Time window for API rate limiter |
+| `RATE_LIMIT_MAX` | `200` | Maximum requests per window per IP |
+
+---
+
+## 3. Installation & Running Instructions
+
+### Step 1: Install Dependencies
+Install dependencies for root, backend, and frontend with a single command:
 ```bash
 npm run install:all
 ```
 
-Or install them manually step-by-step:
-```bash
-# 1. Install root workspace dependencies
-npm install
+*(Alternatively, install step-by-step: `npm install`, then `cd backend && npm install`, then `cd frontend && npm install`)*.
 
-# 2. Install backend dependencies (Express, Mongoose, Passport, Socket.io, Winston, etc.)
-cd backend
-npm install
-cd ..
-
-# 3. Install frontend dependencies (React 18, Vite, Tailwind CSS, Lucide, Vitest, etc.)
-cd frontend
-npm install
-cd ..
-```
-
-### 3. Configure Environment Variables
-
-Copy the provided example environment configuration to create `backend/.env`:
-
-**On Linux / macOS:**
-```bash
-cp backend/.env.example backend/.env
-```
-
-**On Windows (PowerShell):**
-```powershell
-Copy-Item backend/.env.example backend/.env
-```
-
-**On Windows (Command Prompt - CMD):**
-```cmd
-copy backend\.env.example backend\.env
-```
-
-Ensure MongoDB is running locally (`mongodb://127.0.0.1:27017/mern_blog_db`) or replace `MONGODB_URI` with your MongoDB Atlas connection string:
-```env
-PORT=5000
-CLIENT_URL=http://localhost:5173
-MONGODB_URI=mongodb://127.0.0.1:27017/mern_blog_db
-JWT_ACCESS_SECRET=access_secret_super_secure_key_123456789!
-JWT_REFRESH_SECRET=refresh_secret_super_secure_key_987654321!
-JWT_ACCESS_EXPIRATION=15m
-JWT_REFRESH_EXPIRATION=7d
-RATE_LIMIT_WINDOW_MS=900000
-RATE_LIMIT_MAX=200
-```
-
-### 4. Seed the Database
-Pre-populates sample administrators (`admin@example.com`), regular users (`alex@example.com`, `sophia@example.com`), categorized articles, soft-deleted posts, and comments:
+### Step 2: Seed Demo Data
+Populates the database with sample administrators, regular authors, categorized blog posts, soft-deleted posts, and comments:
 ```bash
 npm run seed
 ```
 
-### 5. Run Automated Tests
+### Step 3: Run Automated Tests
+Execute the complete 44-test automated suite:
 ```bash
-# Run the full automated test suite (Backend Jest + Frontend Vitest - 44 tests total):
+# Run both Backend Jest + Frontend Vitest suites:
 npm run test:all
 
-# Run backend integration tests individually (15 tests passed across 4 test suites):
+# Or run backend integration tests individually (15 tests passed):
 npm run test:backend
 
-# Run frontend component tests individually (29 tests passed across 8 test suites):
+# Or run frontend component tests individually (29 tests passed):
 npm run test:frontend
 ```
 
-### 6. Start Development Servers
-Runs backend API (`http://localhost:5000`) and frontend client (`http://localhost:5173`) concurrently:
+### Step 4: Start Development Servers
+Runs both the backend API (`http://localhost:5000`) and the frontend client (`http://localhost:5173`) concurrently:
 ```bash
 npm run dev
 ```
 
-Alternatively, you can run the backend and frontend in separate terminals:
-```bash
-# Terminal 1 (Backend API):
-cd backend
-npm run dev
+*(To run separately: `npm run dev:backend` in one terminal and `npm run dev:frontend` in another)*.
 
-# Terminal 2 (Frontend Client):
-cd frontend
-npm run dev
-```
-
-### 7. Build for Production
+### Step 5: Production Build
 ```bash
 # Build optimized frontend bundle
-cd frontend
 npm run build
 
 # Start backend production server
-cd ../backend
-node src/server.js
+cd backend && node src/server.js
 ```
 
 ---
 
-## Demo Credentials
+## 4. Demo Login Credentials
 
-You can sign in using the **One-Click Quick Demo Sign-In** buttons on the Login page or with these credentials:
+The application includes a **One-Click Demo Sign-In** panel on the login page, or you can use these seeded accounts:
 
 | Role | Email | Password | Permissions |
 | :--- | :--- | :--- | :--- |
-| **Administrator** | `admin@example.com` | `AdminPassword123!` | Access Admin Dashboard, manage all users, restore soft-deleted posts, hard delete, manage all comments |
-| **Regular User** | `alex@example.com` | `UserPassword123!` | Create, edit, and soft-delete own posts and comments |
-| **Regular User** | `sophia@example.com` | `UserPassword123!` | Create, edit, and soft-delete own posts and comments |
+| **Administrator** | `admin@example.com` | `AdminPassword123!` | Access Admin Dashboard, manage all users, restore soft-deleted posts, hard delete posts, manage all comments |
+| **Regular User 1** | `alex@example.com` | `UserPassword123!` | Create posts, edit/soft-delete own posts, comment on articles |
+| **Regular User 2** | `sophia@example.com` | `UserPassword123!` | Create posts, edit/soft-delete own posts, comment on articles |
 
 ---
 
-## RESTful API Endpoints Reference
+## 5. RESTful API Documentation Overview
 
-All endpoints are versioned under `/api/v1`.
+All API endpoints are versioned under the `/api/v1` namespace.
 
-### Authentication (`/api/v1/auth`)
-| Method | Endpoint | Access | Description |
+### Authentication Endpoints (`/api/v1/auth`)
+| Method | Endpoint | Access Level | Description |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/register` | Public (Rate Limited) | Register a new user |
-| `POST` | `/login` | Public (Rate Limited) | Authenticate user & return JWT tokens |
-| `POST` | `/refresh-token` | Public | Rotate and issue new access & refresh tokens |
-| `POST` | `/social` | Public | Google / Facebook OAuth sign-in |
-| `POST` | `/logout` | Authenticated | Revoke refresh token & log out |
-| `GET` | `/me` | Authenticated | Get current authenticated user profile |
+| `POST` | `/register` | Public (Rate Limited) | Register a new user account with hashed password |
+| `POST` | `/login` | Public (Rate Limited) | Authenticate credentials; returns access & refresh tokens |
+| `POST` | `/refresh-token` | Public | Rotates refresh token and issues a new access token |
+| `POST` | `/social` | Public | Google / Facebook OAuth 2.0 social authentication |
+| `POST` | `/logout` | Authenticated | Revokes refresh token and clears session |
+| `GET` | `/me` | Authenticated | Retrieves current authenticated user profile |
 
-### Blog Posts (`/api/v1/posts`)
-| Method | Endpoint | Access | Description |
+### Blog Post Endpoints (`/api/v1/posts`)
+| Method | Endpoint | Access Level | Description |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/` | Public | Paginated list of active posts with search & category filters |
-| `GET` | `/:slug` | Public | Get post details by URL slug and increment view counter |
-| `GET` | `/id/:id` | Public | Get post by ObjectId |
-| `POST` | `/` | Authenticated | Create a new blog post (auto slug generated) |
-| `PUT` | `/:id` | Author / Admin | Update post title, content, tags, or category |
-| `DELETE` | `/:id` | Author / Admin | Soft delete a post (`isDeleted: true`) |
-| `PATCH` | `/:id/restore` | Author / Admin | Restore a soft-deleted post |
-| `DELETE` | `/:id/permanent`| Admin Only | Permanently delete post and all associated comments |
+| `GET` | `/` | Public | Paginated list of active posts with search and category filters |
+| `GET` | `/:slug` | Public | Retrieve article by slug; increments view count |
+| `GET` | `/id/:id` | Public | Retrieve article by MongoDB ObjectId |
+| `POST` | `/` | Authenticated | Create a new blog post (auto slug generation) |
+| `PUT` | `/:id` | Author / Admin | Update post title, content, category, or tags |
+| `DELETE` | `/:id` | Author / Admin | Soft delete a post (`isDeleted: true`, sets `deletedAt`) |
+| `PATCH` | `/:id/restore` | Author / Admin | Restore a soft-deleted post back to active status |
+| `DELETE` | `/:id/permanent`| Admin Only | Permanently hard-delete a post and its comments |
 
-### Comments (`/api/v1/comments`)
-| Method | Endpoint | Access | Description |
+### Comment Endpoints (`/api/v1/comments`)
+| Method | Endpoint | Access Level | Description |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/post/:postId` | Public | List all comments for an article |
-| `POST` | `/post/:postId` | Authenticated | Post a comment (triggers real-time notification) |
+| `GET` | `/post/:postId` | Public | List all comments associated with an article |
+| `POST` | `/post/:postId` | Authenticated | Post a comment (triggers real-time WebSocket notification) |
 | `PUT` | `/:id` | Comment Author | Edit comment content |
 | `DELETE` | `/:id` | Author / Admin | Delete comment |
 
-### Admin Console (`/api/v1/admin`)
-| Method | Endpoint | Access | Description |
+### Admin Console Endpoints (`/api/v1/admin`)
+| Method | Endpoint | Access Level | Description |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/stats` | Admin Only | Global metrics: users, posts, comments, deleted items |
-| `GET` | `/users` | Admin Only | Searchable, paginated user list |
-| `PATCH`| `/users/:id/role` | Admin Only | Toggle user role (`user` <-> `admin`) |
-| `PATCH`| `/users/:id/status`| Admin Only | Suspend or activate user account |
-| `DELETE`| `/users/:id` | Admin Only | Delete user and their associated content |
-| `GET` | `/posts` | Admin Only | List all posts including soft-deleted ones |
-| `GET` | `/logs/activity` | Admin Only | Full audit log stream of user actions |
-| `GET` | `/logs/error` | Admin Only | System error logs |
+| `GET` | `/stats` | Admin Only | Platform statistics: total users, active posts, soft-deleted posts, comments |
+| `GET` | `/users` | Admin Only | Searchable, paginated list of all platform users |
+| `PATCH`| `/users/:id/role` | Admin Only | Promote or demote user role (`user` <-> `admin`) |
+| `PATCH`| `/users/:id/status`| Admin Only | Toggle user status (`active` <-> `suspended`) |
+| `DELETE`| `/users/:id` | Admin Only | Delete user account and associated content |
+| `GET` | `/posts` | Admin Only | Full list of all posts including soft-deleted items |
+| `GET` | `/logs/activity` | Admin Only | Audit activity log stream |
 
 ---
 
-## Evaluation Criteria Mapping
+## 6. Demo Video Walkthrough
 
-| Evaluation Criteria | Implementation Details |
-| :--- | :--- |
-| **Code Quality & Best Practices** | Clean ES6+ modules, strict ESLint standards, Zod schema validation, async handlers, structured responses. |
-| **Proper Use of MERN Stack** | Express 4, Mongoose 8 ODM with compound indexes, React 18 functional components with Hooks & Context API, Node.js v23. |
-| **Clean Architecture & Modularity**| Strict layer decoupling: `Controllers -> Services -> Models`. Independent reusable middlewares for auth, RBAC, logging, rate limiting. |
-| **Security & Optimization** | Bcrypt hashing (12 rounds), dual JWT token rotation, Helmet security headers, rate limiting, XSS sanitization, compound indexes, lean queries. |
-| **Documentation & Reusability** | Detailed `COMMANDS.md` for replication, thorough `README.md`, pre-configured seeder script, and 15 Jest tests. |
+A high-definition walkthrough showcasing the full application flow, admin console, soft deletes, and real-time Socket.io updates is included directly in the repository:
 
----
-
-## Video Walkthrough & Presentation Script
-
-An automated high-definition walkthrough demonstrating all core features, branding, OAuth 2.0 social logins, real-time notification hub, and admin broadcast controls has been generated:
-
-- **Recorded Video File**: [`demo_video/tech_exactly_mern_assignment_walkthrough.webm`](file:///d:/nodereact/mern_assignment/demo_video/tech_exactly_mern_assignment_walkthrough.webm)
-- **Alternate Mirror**: [`demo_video/devsphere_mern_demo_walkthrough.webm`](file:///d:/nodereact/mern_assignment/demo_video/devsphere_mern_demo_walkthrough.webm)
-- **Video Duration**: **~6.2 minutes (380 seconds)** — Fully compliant with the **5–10 minute demo video** assignment deliverable requirement.
-- **Video Resolution**: 1280x720 (HD 720p, 60fps)
-- **Step-by-Step Script**: [`DEMO_SCRIPT.md`](file:///d:/nodereact/mern_assignment/DEMO_SCRIPT.md) (12 scenes with on-screen HUD descriptions)
-
-
+- **Video File**: [`demo_video/tech_exactly_mern_assignment_walkthrough.webm`](demo_video/tech_exactly_mern_assignment_walkthrough.webm)
+- **Duration**: **5.06 minutes (303.6 seconds)** — Strictly satisfies the **5–10 minute demo video** assignment deliverable requirement.
+- **Resolution**: 1280x720 (HD 720p, 60fps)
+- **Scenes Covered**: User registration & authentication, OAuth social flow, post creation & editing, soft deletion & admin one-click restoration, real-time comments, and admin WebSocket broadcast.
