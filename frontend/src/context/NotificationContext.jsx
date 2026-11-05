@@ -19,6 +19,20 @@ export const NotificationProvider = ({ children }) => {
     return typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'unsupported';
   });
 
+  // Toast dispatch
+  const showToast = useCallback((message, type = 'info', duration = 4000) => {
+    const id = Date.now() + Math.random().toString(36).substring(2, 9);
+    setToasts((prev) => [...prev, { id, message, type }]);
+
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, duration);
+  }, []);
+
+  const removeToast = (id) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
+
   // Browser HTML5 Desktop Notification trigger
   const triggerBrowserPush = useCallback((title, body) => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
@@ -67,20 +81,6 @@ export const NotificationProvider = ({ children }) => {
       ...prev.slice(0, 49) // Keep last 50 events
     ]);
   }, []);
-
-  // Toast dispatch
-  const showToast = useCallback((message, type = 'info', duration = 4000) => {
-    const id = Date.now() + Math.random().toString(36).substring(2, 9);
-    setToasts((prev) => [...prev, { id, message, type }]);
-
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, duration);
-  }, []);
-
-  const removeToast = (id) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-  };
 
   const markAllAsRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
