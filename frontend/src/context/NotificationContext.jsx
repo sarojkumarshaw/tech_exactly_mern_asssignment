@@ -15,6 +15,44 @@ export const NotificationProvider = ({ children }) => {
 
   const [notifications, setNotifications] = useState([]);
   const [toasts, setToasts] = useState([]);
+  const [desktopPermission, setDesktopPermission] = useState(() => {
+    return typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'unsupported';
+  });
+
+  // Browser HTML5 Desktop Notification trigger
+  const triggerBrowserPush = useCallback((title, body) => {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      if (Notification.permission === 'granted') {
+        try {
+          new Notification(title, {
+            body,
+            icon: '/favicon.ico'
+          });
+        } catch {
+          // Fallback if browser blocks constructor
+        }
+      }
+    }
+  }, []);
+
+  // Request browser desktop push permission
+  const requestNotificationPermission = useCallback(async () => {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      try {
+        const perm = await Notification.requestPermission();
+        setDesktopPermission(perm);
+        if (perm === 'granted') {
+          showToast('Desktop push notifications enabled!', 'success');
+        } else if (perm === 'denied') {
+          showToast('Desktop push notifications blocked in browser settings', 'warning');
+        }
+        return perm;
+      } catch {
+        return 'denied';
+      }
+    }
+    return 'unsupported';
+  }, [showToast]);
 
   // Helper to log socket events to the UI inspector
   const logEvent = useCallback((direction, eventName, data) => {
@@ -89,12 +127,14 @@ export const NotificationProvider = ({ children }) => {
       logEvent('RECEIVED', 'notification', data);
       setNotifications((prev) => [{ ...data, id: Date.now(), read: false }, ...prev]);
       showToast(data.message, 'info');
+      triggerBrowserPush('Tech Exactly - New Notification', data.message);
     });
 
     // Public post broadcast
     newSocket.on('new_post', (post) => {
       logEvent('RECEIVED', 'new_post', post);
       showToast(`New article published: "${post.title}"`, 'success');
+      triggerBrowserPush('Tech Exactly - New Article Published', post.title);
     });
 
     // Global admin announcement broadcast
@@ -102,6 +142,7 @@ export const NotificationProvider = ({ children }) => {
       logEvent('RECEIVED', 'broadcast_announcement', announcementData);
       setAnnouncement(announcementData);
       showToast(`📢 Announcement: ${announcementData.title}`, 'warning', 6000);
+      triggerBrowserPush(`📢 ${announcementData.title}`, announcementData.message);
     });
 
     // Activity log event for admin room
@@ -112,7 +153,7 @@ export const NotificationProvider = ({ children }) => {
     return () => {
       newSocket.disconnect();
     };
-  }, [user?._id, logEvent, showToast]);
+  }, [user?._id, logEvent, showToast, triggerBrowserPush]);
 
   // Interactive Trigger Methods
   const sendPing = () => {
@@ -166,6 +207,8 @@ export const NotificationProvider = ({ children }) => {
     clearEventLogs,
     notifications,
     unreadCount: notifications.filter((n) => !n.read).length,
+    desktopPermission,
+    requestNotificationPermission,
     toasts,
     showToast,
     removeToast,

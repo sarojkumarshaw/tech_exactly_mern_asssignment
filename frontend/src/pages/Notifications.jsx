@@ -27,6 +27,8 @@ export const Notifications = () => {
     connectionStatus,
     latency,
     socketId,
+    desktopPermission,
+    requestNotificationPermission,
     sendPing,
     sendTestNotification,
     showToast
@@ -118,6 +120,24 @@ export const Notifications = () => {
           >
             Ping
           </button>
+
+          {typeof window !== 'undefined' && 'Notification' in window && (
+            <>
+              <span className="text-slate-300">|</span>
+              <button
+                onClick={requestNotificationPermission}
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all flex items-center gap-1 ${
+                  desktopPermission === 'granted'
+                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                    : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80'
+                }`}
+                title="Enable OS Desktop Push Notifications"
+              >
+                <Bell className="w-3 h-3" />
+                {desktopPermission === 'granted' ? 'Desktop Push Active' : 'Enable Desktop Push'}
+              </button>
+            </>
+          )}
         </div>
       </div>
 
