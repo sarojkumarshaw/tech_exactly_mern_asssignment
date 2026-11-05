@@ -34,6 +34,7 @@ Thumbs.db
 # Local scripts & internal notes
 scripts/
 DEMO_SCRIPT.md
+*.pdf
 
 
 # IDE & Editor caches
