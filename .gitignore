@@ -31,6 +31,10 @@ coverage/
 .DS_Store
 Thumbs.db
 
+# Local scripts
+scripts/
+
+
 # IDE & Editor caches
 .vscode/
 .idea/

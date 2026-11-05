@@ -272,15 +272,6 @@ cd ../backend
 node src/server.js
 ```
 
-### 8. Run Automated Verification Scripts
-```bash
-# Verify OAuth 2.0 Google & Facebook token exchange flows:
-node scripts/test_oauth_flow.js
-
-# Verify Tech Exactly branding, Notification Center, and Socket.io broadcasts:
-node scripts/test_techexactly_features.js
-```
-
 ---
 
 ## Demo Credentials
