@@ -1,8 +1,38 @@
+# Dependencies
 node_modules/
-dist/
-logs/
-*.log
+**/node_modules/
+
+# Environment variables & secrets (NEVER COMMIT)
 .env
+**/.env
+.env.local
+.env.*.local
+*.env
+
+# Production build outputs
+dist/
+**/dist/
+build/
+**/build/
+
+# Application logs
+logs/
+**/logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test coverage
+coverage/
+**/coverage/
+
+# OS-specific files
 .DS_Store
 Thumbs.db
+
+# IDE & Editor caches
+.vscode/
+.idea/
+
 

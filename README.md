@@ -161,46 +161,124 @@ mern_assignment/
 
 ---
 
-## Quickstart & Installation
+## Quickstart & Installation Guide
 
-### 1. Clone & Install Dependencies
-```powershell
-# From project root:
-npm.cmd run install:all
+Follow these step-by-step command line instructions to set up, install, seed, test, and run the project locally.
+
+### 1. Clone the Repository
+```bash
+git clone <YOUR_GITHUB_REPOSITORY_URL>
+cd mern_assignment
 ```
 
-### 2. Configure Environment
-Verify or update `backend/.env`:
+### 2. Install Dependencies
+
+You can install all dependencies across root, backend, and frontend with a single command:
+```bash
+npm run install:all
+```
+
+Or install them manually step-by-step:
+```bash
+# 1. Install root workspace dependencies
+npm install
+
+# 2. Install backend dependencies (Express, Mongoose, Passport, Socket.io, Winston, etc.)
+cd backend
+npm install
+cd ..
+
+# 3. Install frontend dependencies (React 18, Vite, Tailwind CSS, Lucide, Vitest, etc.)
+cd frontend
+npm install
+cd ..
+```
+
+### 3. Configure Environment Variables
+
+Copy the provided example environment configuration to create `backend/.env`:
+
+**On Linux / macOS:**
+```bash
+cp backend/.env.example backend/.env
+```
+
+**On Windows (PowerShell):**
+```powershell
+Copy-Item backend/.env.example backend/.env
+```
+
+**On Windows (Command Prompt - CMD):**
+```cmd
+copy backend\.env.example backend\.env
+```
+
+Ensure MongoDB is running locally (`mongodb://127.0.0.1:27017/mern_blog_db`) or replace `MONGODB_URI` with your MongoDB Atlas connection string:
 ```env
 PORT=5000
+CLIENT_URL=http://localhost:5173
 MONGODB_URI=mongodb://127.0.0.1:27017/mern_blog_db
 JWT_ACCESS_SECRET=access_secret_super_secure_key_123456789!
 JWT_REFRESH_SECRET=refresh_secret_super_secure_key_987654321!
-CLIENT_URL=http://localhost:5173
+JWT_ACCESS_EXPIRATION=15m
+JWT_REFRESH_EXPIRATION=7d
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX=200
 ```
 
-### 3. Seed Demo Data
-Pre-populates sample administrators, regular users, rich articles, soft-deleted posts, and comments:
-```powershell
-npm.cmd run seed
+### 4. Seed the Database
+Pre-populates sample administrators (`admin@example.com`), regular users (`alex@example.com`, `sophia@example.com`), categorized articles, soft-deleted posts, and comments:
+```bash
+npm run seed
 ```
 
-### 4. Run Automated Tests
-```powershell
-# Run entire test suite (Backend Jest + Frontend Vitest):
-npm.cmd run test:all
+### 5. Run Automated Tests
+```bash
+# Run the full automated test suite (Backend Jest + Frontend Vitest - 44 tests total):
+npm run test:all
 
-# Or run backend integration tests individually:
-npm.cmd run test:backend
+# Run backend integration tests individually (15 tests passed across 4 test suites):
+npm run test:backend
 
-# Or run frontend component tests individually:
-npm.cmd run test:frontend
+# Run frontend component tests individually (29 tests passed across 8 test suites):
+npm run test:frontend
 ```
 
-### 5. Start Development Servers
-Runs backend (`http://localhost:5000`) and frontend (`http://localhost:5173`) concurrently:
-```powershell
-npm.cmd run dev
+### 6. Start Development Servers
+Runs backend API (`http://localhost:5000`) and frontend client (`http://localhost:5173`) concurrently:
+```bash
+npm run dev
+```
+
+Alternatively, you can run the backend and frontend in separate terminals:
+```bash
+# Terminal 1 (Backend API):
+cd backend
+npm run dev
+
+# Terminal 2 (Frontend Client):
+cd frontend
+npm run dev
+```
+
+### 7. Build for Production
+```bash
+# Build optimized frontend bundle
+cd frontend
+npm run build
+
+# Start backend production server
+cd ../backend
+node src/server.js
+```
+
+### 8. Run Automated Verification Scripts
+```bash
+# Verify OAuth 2.0 Google & Facebook token exchange flows:
+node scripts/test_oauth_flow.js
+
+# Verify Tech Exactly branding, Notification Center, and Socket.io broadcasts:
+node scripts/test_techexactly_features.js
 ```
 
 ---
